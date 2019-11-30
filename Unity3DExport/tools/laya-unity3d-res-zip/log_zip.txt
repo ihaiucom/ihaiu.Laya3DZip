@@ -1,0 +1,753 @@
+zipCount=31
+
+Directional Light， 数量=1
+   ../../res3d/Conventional/Directional Light.lh
+=====================
+
+Effect_000_BehitCommon， 数量=3
+   ../../res3d/Conventional/Effect_000_BehitCommon__Behit.lh
+   ../../res3d/Conventional/Assets/TextEffect/fx_hit_01.lmat
+   ../../res3d/Conventional/Assets/TextEffect/fx_hit_01.jpg
+=====================
+
+UnityBuiltin， 数量=3
+   ../../res3d/Conventional/Library/unity default resources-Quad.lm
+   ../../res3d/Conventional/Resources/unity_builtin_extra.lmat
+   ../../res3d/Conventional/Library/unity default resources-Plane.lm
+=====================
+
+Effect_000_BehitSword， 数量=18
+   ../../res3d/Conventional/Effect_000_BehitSword__Behit.lh
+   ../../res3d/Conventional/Assets/TextEffect/x_system_gezhi-x_system_gezhi.lm
+   ../../res3d/Conventional/Assets/TextEffect/effect_190.lmat
+   ../../res3d/Conventional/Assets/TextEffect/effect_213.lmat
+   ../../res3d/Conventional/Assets/TextEffect/effect_02.lmat
+   ../../res3d/Conventional/Assets/TextEffect/effect_173.lmat
+   ../../res3d/Conventional/Assets/TextEffect/effect_172.lmat
+   ../../res3d/Conventional/Assets/TextEffect/fxx_kuromu_dokuro_040.lmat
+   ../../res3d/Conventional/Assets/TextEffect/effect_50.lmat
+   ../../res3d/Conventional/Assets/TextEffect/effect_174.lmat
+   ../../res3d/Conventional/Assets/TextEffect/shouji_huaheng.png
+   ../../res3d/Conventional/Assets/TextEffect/shouji_huaheng_02.png
+   ../../res3d/Conventional/Assets/TextEffect/fxx_01glow.png
+   ../../res3d/Conventional/Assets/TextEffect/shouji_baodian_02.png
+   ../../res3d/Conventional/Assets/TextEffect/shouji_baodian_01.png
+   ../../res3d/Conventional/Assets/TextEffect/mm_skill01_6.png
+   ../../res3d/Conventional/Assets/TextEffect/mf_guang.png
+   ../../res3d/Conventional/Assets/TextEffect/kuromu_24.png
+=====================
+
+Effect_000_Circle， 数量=9
+   ../../res3d/Conventional/Effect_000_Circle__Other.lh
+   ../../res3d/Conventional/Assets/TextEffect/ShadowCircle.lmat
+   ../../res3d/Conventional/Assets/TextEffect/shadow_circle.png
+   ../../res3d/Conventional/Effect_000_Circle__Self.lh
+   ../../res3d/Conventional/Assets/TextEffect/dimianguangquan.lmat
+   ../../res3d/Conventional/Assets/TextEffect/dimianguangquan1.lmat
+   ../../res3d/Conventional/Assets/TextEffect/guangquan-guangquan.lani
+   ../../res3d/Conventional/Assets/TextEffect/guangquan1-guangquan1.lani
+   ../../res3d/Conventional/Assets/TextEffect/dimianguangquan.png
+=====================
+
+Assets， 数量=4
+   ../../res3d/Conventional/Assets/Data/Art/Effects/Hero/Meshes/Belphegor/fx_belphegor_mesh_beijingyongtu-Plane001.lm
+   ../../res3d/Conventional/Assets/Forward animation-Forward animation.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Hero/Kyoya Hibari/kyoya_hibari@leave-leave.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Monster/fathoody/fathoody-Take 001.lani
+=====================
+
+Effect_001_LongQi_Skin1， 数量=2
+   ../../res3d/Conventional/Effect_001_LongQi_Skin1__Skill1.lh
+   ../../res3d/Conventional/Effect_001_LongQi_Skin1__Skill2.lh
+=====================
+
+Effect_001_Test_Skin1， 数量=5
+   ../../res3d/Conventional/Effect_001_Test_Skin1__Attack1.lh
+   ../../res3d/Conventional/Assets/TextEffect/fx_daoguang009.lmat
+   ../../res3d/Conventional/Assets/TextEffect/fxx_xanxus@skill_03_glow001.lmat
+   ../../res3d/Conventional/Assets/TextEffect/fx_daoguang009.png
+   ../../res3d/Conventional/Assets/TextEffect/Xanxus_daoguang_glow001.png
+=====================
+
+Assets___TextEffect， 数量=8
+   ../../res3d/Conventional/Assets/TextEffect/fx_particlePlane-fx_particlePlane.lm
+   ../../res3d/Conventional/Assets/TextEffect/smoke_001.png
+   ../../res3d/Conventional/Assets/TextEffect/heidi-Box001.lm
+   ../../res3d/Conventional/Assets/TextEffect/bg.jpg
+   ../../res3d/Conventional/Assets/TextEffect/baozhajianci1.lmat
+   ../../res3d/Conventional/Assets/TextEffect/dimianshuibo.lmat
+   ../../res3d/Conventional/Assets/TextEffect/baozhajianci1.png
+   ../../res3d/Conventional/Assets/TextEffect/001/dimianshuibo.png
+=====================
+
+Effect_1001_Kyoya_Skin1， 数量=127
+   ../../res3d/Conventional/Effect_1001_Kyoya_Skin1__ATTACK0.lh
+   ../../res3d/Conventional/Assets/TextEffect/fx_kyoya_hibari@attack_01.lmat
+   ../../res3d/Conventional/Assets/TextEffect/fx_01lizi.lmat
+   ../../res3d/Conventional/Assets/TextEffect/fx_kyoya_hibari@skill_01_04glow.lmat
+   ../../res3d/Conventional/Assets/TextEffect/fx_kyoya_hibari@skill_02_06smoke.lmat
+   ../../res3d/Conventional/Assets/TextEffect/fx_kyoya_hibari@skill_02_07smoke.lmat
+   ../../res3d/Conventional/Assets/TextEffect/attack_001.png
+   ../../res3d/Conventional/Assets/TextEffect/pian_003.png
+   ../../res3d/Conventional/Assets/TextEffect/glow_002.png
+   ../../res3d/Conventional/Assets/TextEffect/smoke_006.png
+   ../../res3d/Conventional/Effect_1001_Kyoya_Skin1__ATTACK1.lh
+   ../../res3d/Conventional/Assets/TextEffect/fx_kyoya_hibari@attack_02_01.lmat
+   ../../res3d/Conventional/Assets/TextEffect/attack_002.png
+   ../../res3d/Conventional/Effect_1001_Kyoya_Skin1__ATTACK2.lh
+   ../../res3d/Conventional/Assets/TextEffect/fx_kyoya_hibari@attack_03.lmat
+   ../../res3d/Conventional/Assets/TextEffect/fx_kyoya_hibari@attack_xiantiao004.lmat
+   ../../res3d/Conventional/Assets/TextEffect/kyoya_hibari@attack_03-kyoya_hibari@attack_03.lani
+   ../../res3d/Conventional/Assets/TextEffect/attack_003.png
+   ../../res3d/Conventional/Assets/TextEffect/xiantiao_004.png
+   ../../res3d/Conventional/Effect_1001_Kyoya_Skin1__ATTACK3.lh
+   ../../res3d/Conventional/Assets/TextEffect/fx_kyoya_hibari@attack_04_03.lmat
+   ../../res3d/Conventional/Assets/TextEffect/fx_kyoya_hibari@attack_04_01.lmat
+   ../../res3d/Conventional/Assets/TextEffect/fx_04lizi.lmat
+   ../../res3d/Conventional/Assets/TextEffect/fx_kyoya_hibari@skill_02_02shanguang.lmat
+   ../../res3d/Conventional/Assets/TextEffect/fx_kyoya_hibari@skill_02_03shanguang.lmat
+   ../../res3d/Conventional/Assets/TextEffect/fx_kyoya_hibari@skill_01_xian.lmat
+   ../../res3d/Conventional/Assets/TextEffect/attack_0420.png
+   ../../res3d/Conventional/Assets/TextEffect/attack_0410.png
+   ../../res3d/Conventional/Assets/TextEffect/lizi_002.png
+   ../../res3d/Conventional/Assets/TextEffect/shangguang_002.png
+   ../../res3d/Conventional/Assets/TextEffect/guang_007.png
+   ../../res3d/Conventional/Assets/TextEffect/xian_002.png
+   ../../res3d/Conventional/Effect_1001_Kyoya_Skin1__EFFECT1_03.lh
+   ../../res3d/Conventional/Assets/TextEffect/fx_kyoya_hibari@skill_01_03glow.lmat
+   ../../res3d/Conventional/Assets/TextEffect/fx_kyoya_hibari@skill_01_01smoke.lmat
+   ../../res3d/Conventional/Assets/TextEffect/fx_02_01lizi.lmat
+   ../../res3d/Conventional/Assets/TextEffect/kyoya_hibari@skill_01-kyoya_hibari@skill_01.lani
+   ../../res3d/Conventional/Assets/TextEffect/smoke_002.png
+   ../../res3d/Conventional/Effect_1001_Kyoya_Skin1__EFFECT1_03_w.lh
+   ../../res3d/Conventional/Assets/TextEffect/fx_02lizi.lmat
+   ../../res3d/Conventional/Assets/TextEffect/fx_03lizi.lmat
+   ../../res3d/Conventional/Assets/TextEffect/pian_002.png
+   ../../res3d/Conventional/Effect_1001_Kyoya_Skin1__EFFECT1_04.lh
+   ../../res3d/Conventional/Assets/TextEffect/fx_kyoya_hibari@ult_01daoguang.lmat
+   ../../res3d/Conventional/Assets/TextEffect/ult_01daoguang.png
+   ../../res3d/Conventional/Effect_1001_Kyoya_Skin1__EFFECT1_05.lh
+   ../../res3d/Conventional/Assets/TextEffect/fx_kyoya_hibari@skill_01_03smoke.lmat
+   ../../res3d/Conventional/Assets/TextEffect/smoke_003.png
+   ../../res3d/Conventional/Effect_1001_Kyoya_Skin1__EFFECT1_06.lh
+   ../../res3d/Conventional/Assets/TextEffect/fx_kyoya_hibari@skill_02_01xian.lmat
+   ../../res3d/Conventional/Assets/TextEffect/glow_04.png
+   ../../res3d/Conventional/Effect_1001_Kyoya_Skin1__EFFECT1_07.lh
+   ../../res3d/Conventional/Assets/TextEffect/fx_suishi-suishi.lm
+   ../../res3d/Conventional/Assets/TextEffect/fx_kyoya_hibari@skill_01_04daoguang.lmat
+   ../../res3d/Conventional/Assets/TextEffect/fx_kyoya_hibari@skill_01_02glow.lmat
+   ../../res3d/Conventional/Assets/TextEffect/fx_kyoya_hibari@skill_01_0baodian.lmat
+   ../../res3d/Conventional/Assets/TextEffect/fx_kyoya_hibari@skill_01_01dimian.lmat
+   ../../res3d/Conventional/Assets/TextEffect/fx_kyoya_hibari@ult_guang009.lmat
+   ../../res3d/Conventional/Assets/TextEffect/fx_kyoya_hibari@skill_02_guang_005.lmat
+   ../../res3d/Conventional/Assets/TextEffect/fx_kyoya_hibari@skill_02_0baodian.lmat
+   ../../res3d/Conventional/Assets/TextEffect/fx_kyoya_hibari@ult_suishi001.lmat
+   ../../res3d/Conventional/Assets/TextEffect/fx_kyoya_hibari@skill_01_008daoguang.lmat
+   ../../res3d/Conventional/Assets/TextEffect/daoguang_04.png
+   ../../res3d/Conventional/Assets/TextEffect/baodian_001.png
+   ../../res3d/Conventional/Assets/TextEffect/dimian_001.png
+   ../../res3d/Conventional/Assets/TextEffect/glow_001.png
+   ../../res3d/Conventional/Assets/TextEffect/guang_005.png
+   ../../res3d/Conventional/Assets/TextEffect/shitou_001.jpg
+   ../../res3d/Conventional/Effect_1001_Kyoya_Skin1__EFFECT2_02.lh
+   ../../res3d/Conventional/Assets/TextEffect/fx_chomgci-fx_chomgci.lm
+   ../../res3d/Conventional/Assets/TextEffect/fx_kyoya_hibari@ult_chongci_001.lmat
+   ../../res3d/Conventional/Assets/TextEffect/fx_kyoya_hibari@ult_smoke007.lmat
+   ../../res3d/Conventional/Assets/TextEffect/chongci_001.png
+   ../../res3d/Conventional/Assets/TextEffect/smoke_007.png
+   ../../res3d/Conventional/Effect_1001_Kyoya_Skin1__EFFECT2_03.lh
+   ../../res3d/Conventional/Effect_1001_Kyoya_Skin1__EFFECT2_04.lh
+   ../../res3d/Conventional/Assets/TextEffect/fx_hit001.lmat
+   ../../res3d/Conventional/Assets/TextEffect/hit_001.png
+   ../../res3d/Conventional/Effect_1001_Kyoya_Skin1__EFFECT3_01.lh
+   ../../res3d/Conventional/Assets/TextEffect/fx_kyoya_hibari@ult_guang008.lmat
+   ../../res3d/Conventional/Assets/TextEffect/guang_008.png
+   ../../res3d/Conventional/Effect_1001_Kyoya_Skin1__EFFECT3_01_w.lh
+   ../../res3d/Conventional/Effect_1001_Kyoya_Skin1__EFFECT3_02.lh
+   ../../res3d/Conventional/Effect_1001_Kyoya_Skin1__EFFECT3_02_w.lh
+   ../../res3d/Conventional/Effect_1001_Kyoya_Skin1__EFFECT3_03.lh
+   ../../res3d/Conventional/Assets/TextEffect/fx_kyoya_hibari@skill_03_03-fx_kyoya_hibari@skill_03_03.lani
+   ../../res3d/Conventional/Effect_1001_Kyoya_Skin1__EFFECT3_03_w.lh
+   ../../res3d/Conventional/Effect_1001_Kyoya_Skin1__EFFECT3_04.lh
+   ../../res3d/Conventional/Assets/TextEffect/fx_kyoya_hibari@skill_01_006daoguang.lmat
+   ../../res3d/Conventional/Assets/TextEffect/daoguang_006.png
+   ../../res3d/Conventional/Effect_1001_Kyoya_Skin1__EFFECT3_04_w.lh
+   ../../res3d/Conventional/Effect_1001_Kyoya_Skin1__EFFECT3_05.lh
+   ../../res3d/Conventional/Assets/TextEffect/fx_kyoya_hibari@skill_03_05_ani-fx_kyoya_hibari@skill_03_05_ani.lani
+   ../../res3d/Conventional/Effect_1001_Kyoya_Skin1__EFFECT3_05_w.lh
+   ../../res3d/Conventional/Assets/TextEffect/fx_kyoya_hibari@skill_01_02smoke.lmat
+   ../../res3d/Conventional/Assets/TextEffect/smoke_04.png
+   ../../res3d/Conventional/Effect_1001_Kyoya_Skin1__EFFECT4_01.lh
+   ../../res3d/Conventional/Effect_1001_Kyoya_Skin1__EFFECT4_02.lh
+   ../../res3d/Conventional/Effect_1001_Kyoya_Skin1__EFFECT4_02_w.lh
+   ../../res3d/Conventional/Effect_1001_Kyoya_Skin1__EFFECT4_03.lh
+   ../../res3d/Conventional/Assets/TextEffect/fxx_kyoya_hibari@skill_ult_03-fxx_kyoya_hibari@skill_ult_03.lani
+   ../../res3d/Conventional/Effect_1001_Kyoya_Skin1__EFFECT4_03_w.lh
+   ../../res3d/Conventional/Effect_1001_Kyoya_Skin1__EFFECT4_04.lh
+   ../../res3d/Conventional/Effect_1001_Kyoya_Skin1__EFFECT4_04_w.lh
+   ../../res3d/Conventional/Effect_1001_Kyoya_Skin1__EFFECT4_05.lh
+   ../../res3d/Conventional/Assets/TextEffect/fx_kyoya_hibari@skill_03_05-fx_kyoya_hibari@skill_03_05.lani
+   ../../res3d/Conventional/Effect_1001_Kyoya_Skin1__EFFECT4_05_w.lh
+   ../../res3d/Conventional/Effect_1001_Kyoya_Skin1__EFFECT4_06.lh
+   ../../res3d/Conventional/Effect_1001_Kyoya_Skin1__EFFECT4_06_w.lh
+   ../../res3d/Conventional/Effect_1001_Kyoya_Skin1__EFFECT4_07.lh
+   ../../res3d/Conventional/Effect_1001_Kyoya_Skin1__EFFECT4_07_01.lh
+   ../../res3d/Conventional/Effect_1001_Kyoya_Skin1__EFFECT4_07_w.lh
+   ../../res3d/Conventional/Effect_1001_Kyoya_Skin1__EFFECT4_08.lh
+   ../../res3d/Conventional/Effect_1001_Kyoya_Skin1__EFFECT4_09.lh
+   ../../res3d/Conventional/Assets/TextEffect/fx_kyoya_hibari@ult_dimian_002.lmat
+   ../../res3d/Conventional/Assets/TextEffect/fx_01shitou.lmat
+   ../../res3d/Conventional/Assets/TextEffect/fxx_xanxus@skill_02_glow004.lmat
+   ../../res3d/Conventional/Assets/TextEffect/fx_008smoke.lmat
+   ../../res3d/Conventional/Assets/TextEffect/fx_008smoke_01.lmat
+   ../../res3d/Conventional/Assets/TextEffect/dimian_002.png
+   ../../res3d/Conventional/Assets/TextEffect/sawada_shitou001.png
+   ../../res3d/Conventional/Assets/TextEffect/glow_004.jpg
+   ../../res3d/Conventional/Assets/TextEffect/fx_008smoke.png
+   ../../res3d/Conventional/Effect_1001_Kyoya_Skin1__EFFECT4_10.lh
+   ../../res3d/Conventional/Assets/TextEffect/fx_kyoya_hibari@skill_bg.lmat
+   ../../res3d/Conventional/Effect_1001_Kyoya_Skin1__JUMP_ATTACK0.lh
+   ../../res3d/Conventional/Effect_1001_Kyoya_Skin1__RUN_ATTACK0.lh
+=====================
+
+Effect_1002_yamamototakeshi_Skin1_RUN_ATTACK0， 数量=5
+   ../../res3d/Conventional/Effect_1002_yamamototakeshi_Skin1_RUN_ATTACK0.lh
+   ../../res3d/Conventional/Assets/TextEffect/shuidaoguang10-Plane001.lm
+   ../../res3d/Conventional/Assets/TextEffect/shui.lmat
+   ../../res3d/Conventional/Assets/TextEffect/shui1.lmat
+   ../../res3d/Conventional/Assets/TextEffect/001/dilie1.png
+=====================
+
+Effect_1002_yamamototakeshi_Skin1____Effect_1002_yamamototakeshi_Skin1_RUN_ATTACK0， 数量=10
+   ../../res3d/Conventional/Assets/TextEffect/fx_belphegor_mesh_baodianpian-Plane006.lm
+   ../../res3d/Conventional/Assets/TextEffect/shuidaoguang8-Plane007.lm
+   ../../res3d/Conventional/Assets/TextEffect/fx_fire_07_aplha1.lmat
+   ../../res3d/Conventional/Assets/TextEffect/jingtouguangyun_00001.lmat
+   ../../res3d/Conventional/Assets/TextEffect/jianqishui1.lmat
+   ../../res3d/Conventional/Assets/Data/Art/Effects/Hero/Materials/Belphegor/fx_belphegor_mater_sparking_eff1.lmat
+   ../../res3d/Conventional/Assets/TextEffect/001/fx_fire_07_aplha1.png
+   ../../res3d/Conventional/Assets/TextEffect/001/jingtouguangyun_00000.png
+   ../../res3d/Conventional/Assets/TextEffect/001/jianqishuihua.png
+   ../../res3d/Conventional/Assets/Data/Texture/Effect/Hero/Belphegor/fx_tex_sparking_eff00.png
+=====================
+
+Effect_1002_yamamototakeshi_Skin1_RUN_ATTACK0_01， 数量=1
+   ../../res3d/Conventional/Effect_1002_yamamototakeshi_Skin1_RUN_ATTACK0_01.lh
+=====================
+
+Effect_1002_yamamototakeshi_Skin1____Effect_1002_yamamototakeshi_Skin1_RUN_ATTACK0_01， 数量=16
+   ../../res3d/Conventional/Assets/TextEffect/sbw9-Plane001.lm
+   ../../res3d/Conventional/Assets/TextEffect/shuidaoguang7-Plane005.lm
+   ../../res3d/Conventional/Assets/TextEffect/dimianhuahen.lmat
+   ../../res3d/Conventional/Assets/TextEffect/fx_sheet_alpha1.lmat
+   ../../res3d/Conventional/Assets/TextEffect/jianqishui.lmat
+   ../../res3d/Conventional/Assets/TextEffect/banyuanguang.lmat
+   ../../res3d/Conventional/Assets/TextEffect/dimianhuahenguang.lmat
+   ../../res3d/Conventional/Assets/TextEffect/shuidimain.lmat
+   ../../res3d/Conventional/Assets/TextEffect/18.lmat
+   ../../res3d/Conventional/Assets/TextEffect/dimianhuahen.png
+   ../../res3d/Conventional/Assets/TextEffect/001/fx_sheet_blueu.png
+   ../../res3d/Conventional/Assets/TextEffect/001/jianqishui1.png
+   ../../res3d/Conventional/Assets/TextEffect/banyuanguang.png
+   ../../res3d/Conventional/Assets/TextEffect/dimianhuahenguang.png
+   ../../res3d/Conventional/Assets/TextEffect/001/shuidimain.png
+   ../../res3d/Conventional/Assets/TextEffect/17.png
+=====================
+
+Effect_1002_yamamototakeshi_Skin1， 数量=200
+   ../../res3d/Conventional/Effect_1002_yamamototakeshi_Skin1__ATTACK0.lh
+   ../../res3d/Conventional/Assets/Data/Art/Effects/Hero/Meshes/Belphegor/fx_belphegor_mesh_02dg2-Plane002.lm
+   ../../res3d/Conventional/Assets/TextEffect/14.lmat
+   ../../res3d/Conventional/Assets/TextEffect/fx_fire_07_aplha2.lmat
+   ../../res3d/Conventional/Assets/TextEffect/SBW7-SBW7.lani
+   ../../res3d/Conventional/Assets/TextEffect/13.png
+   ../../res3d/Conventional/Effect_1002_yamamototakeshi_Skin1__ATTACK1.lh
+   ../../res3d/Conventional/Assets/TextEffect/banyuana-Plane004.lm
+   ../../res3d/Conventional/Assets/TextEffect/sbw3-Plane001.lm
+   ../../res3d/Conventional/Assets/TextEffect/shuidaoguang5.lmat
+   ../../res3d/Conventional/Assets/TextEffect/fx_sheet_blue2.lmat
+   ../../res3d/Conventional/Assets/TextEffect/shuizu.lmat
+   ../../res3d/Conventional/Assets/TextEffect/white_trail_d_sheetluoxian1.lmat
+   ../../res3d/Conventional/Assets/TextEffect/001/shuidaoguang4.png
+   ../../res3d/Conventional/Assets/TextEffect/001/shuizu.png
+   ../../res3d/Conventional/Assets/TextEffect/white_trail_d_sheetluoxian.png
+   ../../res3d/Conventional/Effect_1002_yamamototakeshi_Skin1__ATTACK2.lh
+   ../../res3d/Conventional/Assets/TextEffect/shuidaoguang3-Plane004.lm
+   ../../res3d/Conventional/Assets/TextEffect/fx_belphegor_mesh_dimian-Plane006.lm
+   ../../res3d/Conventional/Assets/TextEffect/fx_water_05.lmat
+   ../../res3d/Conventional/Assets/TextEffect/jianqishuihua1.lmat
+   ../../res3d/Conventional/Assets/TextEffect/baozhajianci2.lmat
+   ../../res3d/Conventional/Assets/TextEffect/daoguangxuleinan.lmat
+   ../../res3d/Conventional/Assets/TextEffect/cmn_aura11_alpha.png
+   ../../res3d/Conventional/Assets/TextEffect/jianqishuihua1.png
+   ../../res3d/Conventional/Assets/TextEffect/001/daoguangxuleinan.png
+   ../../res3d/Conventional/Effect_1002_yamamototakeshi_Skin1__ATTACK3.lh
+   ../../res3d/Conventional/Assets/TextEffect/jianying1_00000.lmat
+   ../../res3d/Conventional/Assets/TextEffect/16.lmat
+   ../../res3d/Conventional/Assets/TextEffect/17.lmat
+   ../../res3d/Conventional/Assets/TextEffect/fx_tex_alpha_00000_00000_000002.lmat
+   ../../res3d/Conventional/Assets/TextEffect/dimianshuibo1.lmat
+   ../../res3d/Conventional/Assets/TextEffect/jianying1_00000.png
+   ../../res3d/Conventional/Assets/TextEffect/15.png
+   ../../res3d/Conventional/Assets/TextEffect/16.png
+   ../../res3d/Conventional/Assets/TextEffect/fx_tex_alpha_00000_00000_000001.png
+   ../../res3d/Conventional/Effect_1002_yamamototakeshi_Skin1__EFFECT1.lh
+   ../../res3d/Conventional/Assets/TextEffect/plane_08-Sphere001.lm
+   ../../res3d/Conventional/Assets/TextEffect/shuidaoguang4-Plane005.lm
+   ../../res3d/Conventional/Assets/TextEffect/sbw6-Plane002.lm
+   ../../res3d/Conventional/Assets/TextEffect/19_00001.lmat
+   ../../res3d/Conventional/Assets/Data/Art/Effects/Hero/Materials/Belphegor/fx_belphegor_mater_glow_00002.lmat
+   ../../res3d/Conventional/Assets/TextEffect/19.lmat
+   ../../res3d/Conventional/Assets/TextEffect/20.lmat
+   ../../res3d/Conventional/Assets/TextEffect/fx_belphegor_mater_ack_01dg1.lmat
+   ../../res3d/Conventional/Assets/TextEffect/19_00000.png
+   ../../res3d/Conventional/Assets/Data/Texture/Effect/Hero/Belphegor/fx_tex_glow_00000.png
+   ../../res3d/Conventional/Assets/TextEffect/18.png
+   ../../res3d/Conventional/Assets/Data/Texture/Effect/Hero/Belphegor/fx_tex_attack_05dg1.png
+   ../../res3d/Conventional/Effect_1002_yamamototakeshi_Skin1__EFFECT1_01.lh
+   ../../res3d/Conventional/Assets/TextEffect/sbw8-Plane001.lm
+   ../../res3d/Conventional/Assets/TextEffect/shuidaoguang4.lmat
+   ../../res3d/Conventional/Effect_1002_yamamototakeshi_Skin1__EFFECT1_02.lh
+   ../../res3d/Conventional/Assets/TextEffect/fx_belphegor_mesh_banyuan-Plane003.lm
+   ../../res3d/Conventional/Effect_1002_yamamototakeshi_Skin1__EFFECT2.lh
+   ../../res3d/Conventional/Assets/TextEffect/sbw5-Sphere003.lm
+   ../../res3d/Conventional/Assets/TextEffect/sbw2-Sphere003.lm
+   ../../res3d/Conventional/Assets/TextEffect/sbw1-Sphere004.lm
+   ../../res3d/Conventional/Assets/TextEffect/9.lmat
+   ../../res3d/Conventional/Assets/TextEffect/5.lmat
+   ../../res3d/Conventional/Assets/TextEffect/2.lmat
+   ../../res3d/Conventional/Assets/TextEffect/1.lmat
+   ../../res3d/Conventional/Assets/TextEffect/4.lmat
+   ../../res3d/Conventional/Assets/TextEffect/3.lmat
+   ../../res3d/Conventional/Assets/TextEffect/7.lmat
+   ../../res3d/Conventional/Assets/TextEffect/8.lmat
+   ../../res3d/Conventional/Assets/TextEffect/10.lmat
+   ../../res3d/Conventional/Assets/TextEffect/11.lmat
+   ../../res3d/Conventional/Assets/TextEffect/SBW6-SBW6.lani
+   ../../res3d/Conventional/Assets/TextEffect/SBW4-SBW4.lani
+   ../../res3d/Conventional/Assets/TextEffect/SBW3-SBW3.lani
+   ../../res3d/Conventional/Assets/TextEffect/SBW2-SBW2.lani
+   ../../res3d/Conventional/Assets/TextEffect/SBW1-SBW1.lani
+   ../../res3d/Conventional/Assets/TextEffect/SBW5-SBW5.lani
+   ../../res3d/Conventional/Assets/TextEffect/9.png
+   ../../res3d/Conventional/Assets/TextEffect/5.png
+   ../../res3d/Conventional/Assets/TextEffect/2.png
+   ../../res3d/Conventional/Assets/TextEffect/1.png
+   ../../res3d/Conventional/Assets/TextEffect/4.png
+   ../../res3d/Conventional/Assets/TextEffect/3.png
+   ../../res3d/Conventional/Assets/TextEffect/7.png
+   ../../res3d/Conventional/Assets/TextEffect/8.png
+   ../../res3d/Conventional/Assets/TextEffect/10.png
+   ../../res3d/Conventional/Assets/TextEffect/11.png
+   ../../res3d/Conventional/Effect_1002_yamamototakeshi_Skin1__EFFECT2_01.lh
+   ../../res3d/Conventional/Assets/TextEffect/13.lmat
+   ../../res3d/Conventional/Assets/TextEffect/fx_sheet_alpha2.lmat
+   ../../res3d/Conventional/Assets/TextEffect/12.png
+   ../../res3d/Conventional/Effect_1002_yamamototakeshi_Skin1__EFFECT3_01_01.lh
+   ../../res3d/Conventional/Assets/TextEffect/sbw10-Plane001.lm
+   ../../res3d/Conventional/Assets/TextEffect/sbw13-对象002.lm
+   ../../res3d/Conventional/Assets/TextEffect/25.lmat
+   ../../res3d/Conventional/Assets/TextEffect/SBW11-SBW11.lani
+   ../../res3d/Conventional/Assets/TextEffect/SBW12-SBW12.lani
+   ../../res3d/Conventional/Assets/TextEffect/19.png
+   ../../res3d/Conventional/Effect_1002_yamamototakeshi_Skin1__EFFECT3_02_01.lh
+   ../../res3d/Conventional/Assets/TextEffect/fx_sheet_blue1.lmat
+   ../../res3d/Conventional/Assets/TextEffect/001/fx_sheet_blue.png
+   ../../res3d/Conventional/Effect_1002_yamamototakeshi_Skin1__EFFECT4_01.lh
+   ../../res3d/Conventional/Assets/TextEffect/dimianshuibo2.lmat
+   ../../res3d/Conventional/Assets/TextEffect/001/shui-shui.lani
+   ../../res3d/Conventional/Effect_1002_yamamototakeshi_Skin1__EFFECT4_02.lh
+   ../../res3d/Conventional/Assets/TextEffect/bailan8-Plane002.lm
+   ../../res3d/Conventional/Assets/TextEffect/sbw18-Plane005.lm
+   ../../res3d/Conventional/Assets/TextEffect/001/white_trail_d_sheetluoxian2.lmat
+   ../../res3d/Conventional/Assets/TextEffect/baozhajianciA1.lmat
+   ../../res3d/Conventional/Assets/TextEffect/white_trail_d_sheetluoxian.lmat
+   ../../res3d/Conventional/Assets/TextEffect/001/white_trail_d_sheetluoxian1.lmat
+   ../../res3d/Conventional/Assets/TextEffect/26.lmat
+   ../../res3d/Conventional/Assets/TextEffect/SBW23-SBW23.lani
+   ../../res3d/Conventional/Assets/TextEffect/white_trail_d_sheetluoxian2.png
+   ../../res3d/Conventional/Assets/TextEffect/baozhajianci.png
+   ../../res3d/Conventional/Assets/TextEffect/white_trail_d_sheetluoxian1.png
+   ../../res3d/Conventional/Assets/TextEffect/20.png
+   ../../res3d/Conventional/Effect_1002_yamamototakeshi_Skin1__EFFECT4_03.lh
+   ../../res3d/Conventional/Assets/TextEffect/sbw15-Plane002.lm
+   ../../res3d/Conventional/Assets/TextEffect/sbw16-Plane003.lm
+   ../../res3d/Conventional/Assets/TextEffect/sbw17-Plane004.lm
+   ../../res3d/Conventional/Assets/TextEffect/20_00000.lmat
+   ../../res3d/Conventional/Assets/TextEffect/15.lmat
+   ../../res3d/Conventional/Assets/TextEffect/24.lmat
+   ../../res3d/Conventional/Assets/TextEffect/SBW17-SBW17.lani
+   ../../res3d/Conventional/Assets/TextEffect/SBW18-SBW18.lani
+   ../../res3d/Conventional/Assets/TextEffect/SBW19-SBW19.lani
+   ../../res3d/Conventional/Assets/TextEffect/SBW20-SBW20.lani
+   ../../res3d/Conventional/Assets/TextEffect/SBW21-SBW21.lani
+   ../../res3d/Conventional/Assets/TextEffect/SBW22-SBW22.lani
+   ../../res3d/Conventional/Assets/TextEffect/20_00000.png
+   ../../res3d/Conventional/Assets/TextEffect/14.png
+   ../../res3d/Conventional/Effect_1002_yamamototakeshi_Skin1__EFFECT4_04.lh
+   ../../res3d/Conventional/Assets/TextEffect/sbw12-Plane001.lm
+   ../../res3d/Conventional/Assets/TextEffect/sbw11-Plane001.lm
+   ../../res3d/Conventional/Assets/TextEffect/sbw14-Plane001.lm
+   ../../res3d/Conventional/Assets/TextEffect/fx_belphegor_mesh_dimianyanwu-Plane004.lm
+   ../../res3d/Conventional/Assets/TextEffect/23.lmat
+   ../../res3d/Conventional/Assets/TextEffect/22.lmat
+   ../../res3d/Conventional/Assets/TextEffect/shuidao4.lmat
+   ../../res3d/Conventional/Assets/TextEffect/shuiwu.lmat
+   ../../res3d/Conventional/Assets/TextEffect/dimianhuahen1.lmat
+   ../../res3d/Conventional/Assets/TextEffect/dimianhuahenguang1.lmat
+   ../../res3d/Conventional/Assets/TextEffect/fx_tex_direct3.lmat
+   ../../res3d/Conventional/Assets/TextEffect/SBW24-SBW24.lani
+   ../../res3d/Conventional/Assets/TextEffect/SBW13-SBW13.lani
+   ../../res3d/Conventional/Assets/TextEffect/SBW16-SBW16.lani
+   ../../res3d/Conventional/Assets/TextEffect/SBW14-SBW14.lani
+   ../../res3d/Conventional/Assets/TextEffect/SBW15-SBW15.lani
+   ../../res3d/Conventional/Assets/TextEffect/shuidao3.png
+   ../../res3d/Conventional/Assets/TextEffect/shuidao4.png
+   ../../res3d/Conventional/Assets/TextEffect/001/shuiwu.png
+   ../../res3d/Conventional/Assets/TextEffect/dimianhuahen1.png
+   ../../res3d/Conventional/Assets/TextEffect/dimianhuahenguang1.png
+   ../../res3d/Conventional/Assets/TextEffect/sfxdata10125.png
+   ../../res3d/Conventional/Effect_1002_yamamototakeshi_Skin1__EFFECT5.lh
+   ../../res3d/Conventional/Assets/TextEffect/da4-Plane005.lm
+   ../../res3d/Conventional/Assets/TextEffect/da3-Plane003.lm
+   ../../res3d/Conventional/Assets/TextEffect/da5-Cylinder002.lm
+   ../../res3d/Conventional/Assets/TextEffect/da6-Cylinder002.lm
+   ../../res3d/Conventional/Assets/TextEffect/da8-Plane001.lm
+   ../../res3d/Conventional/Assets/TextEffect/da7-对象001.lm
+   ../../res3d/Conventional/Assets/TextEffect/da9-Plane002.lm
+   ../../res3d/Conventional/Assets/TextEffect/da11-Plane002.lm
+   ../../res3d/Conventional/Assets/TextEffect/sa12.lmat
+   ../../res3d/Conventional/Assets/TextEffect/sa.lmat
+   ../../res3d/Conventional/Assets/TextEffect/sa9.lmat
+   ../../res3d/Conventional/Assets/TextEffect/d23.lmat
+   ../../res3d/Conventional/Assets/TextEffect/sa13.lmat
+   ../../res3d/Conventional/Assets/TextEffect/sa17.lmat
+   ../../res3d/Conventional/Assets/TextEffect/sa6.lmat
+   ../../res3d/Conventional/Assets/TextEffect/sa15.lmat
+   ../../res3d/Conventional/Assets/TextEffect/sa11.lmat
+   ../../res3d/Conventional/Assets/TextEffect/d2-d2.lani
+   ../../res3d/Conventional/Assets/TextEffect/d4-d4.lani
+   ../../res3d/Conventional/Assets/TextEffect/d5-d5.lani
+   ../../res3d/Conventional/Assets/TextEffect/d6-d6.lani
+   ../../res3d/Conventional/Assets/TextEffect/d7-d7.lani
+   ../../res3d/Conventional/Assets/TextEffect/d8-d8.lani
+   ../../res3d/Conventional/Assets/TextEffect/d9-d9.lani
+   ../../res3d/Conventional/Assets/TextEffect/d10-d10.lani
+   ../../res3d/Conventional/Assets/TextEffect/sa.png
+   ../../res3d/Conventional/Assets/TextEffect/sa8.png
+   ../../res3d/Conventional/Assets/TextEffect/sa9.png
+   ../../res3d/Conventional/Assets/TextEffect/23.png
+   ../../res3d/Conventional/Assets/TextEffect/sa13.png
+   ../../res3d/Conventional/Assets/TextEffect/sa17.png
+   ../../res3d/Conventional/Assets/TextEffect/sa6.png
+   ../../res3d/Conventional/Assets/TextEffect/sa11.png
+   ../../res3d/Conventional/Effect_1002_yamamototakeshi_Skin1__EFFECT5_01.lh
+   ../../res3d/Conventional/Assets/TextEffect/da10-Plane001.lm
+   ../../res3d/Conventional/Assets/TextEffect/d24.lmat
+   ../../res3d/Conventional/Assets/TextEffect/d25.lmat
+   ../../res3d/Conventional/Assets/TextEffect/d11-d11.lani
+   ../../res3d/Conventional/Assets/TextEffect/sa1.png
+   ../../res3d/Conventional/Assets/TextEffect/sa16.png
+   ../../res3d/Conventional/Effect_1002_yamamototakeshi_Skin1__EFFECT5_02.lh
+   ../../res3d/Conventional/Assets/TextEffect/heidi.lmat
+   ../../res3d/Conventional/Assets/TextEffect/heidi.jpg
+   ../../res3d/Conventional/Effect_1002_yamamototakeshi_Skin1__JUMP_ATTACK0.lh
+   ../../res3d/Conventional/Assets/TextEffect/da12-Plane002.lm
+   ../../res3d/Conventional/Assets/TextEffect/d12-d12.lani
+   ../../res3d/Conventional/Effect_1002_yamamototakeshi_Skin1__JUMP_ATTACK0_01.lh
+=====================
+
+Effect_13001_fade， 数量=2
+   ../../res3d/Conventional/Effect_13001_fade.lh
+   ../../res3d/Conventional/Assets/TextEffect/fx_kyoya_hibari@skill_02bg.lmat
+=====================
+
+Effect_5001_Fathoody， 数量=73
+   ../../res3d/Conventional/Effect_5001_Fathoody__attack01_01.lh
+   ../../res3d/Conventional/Assets/TextEffect/fx_001-Plane015.lm
+   ../../res3d/Conventional/Assets/TextEffect/fx_002-Plane015.lm
+   ../../res3d/Conventional/Assets/TextEffect/fx_Jietouhunhun_trail_001.lmat
+   ../../res3d/Conventional/Assets/TextEffect/fx_Jietouhunhun_trail_002.lmat
+   ../../res3d/Conventional/Assets/TextEffect/fx_Jietouhunhun_trail_003.lmat
+   ../../res3d/Conventional/Assets/TextEffect/fx_Jietouhunhun_trail_004.lmat
+   ../../res3d/Conventional/Assets/TextEffect/fx_Jietouhunhun_trail_005.lmat
+   ../../res3d/Conventional/Assets/TextEffect/fx_Jietouhunhun_glow_001.lmat
+   ../../res3d/Conventional/Assets/TextEffect/fx_Jietouhunhun_daoguang_01-fx_Jietouhunhun_daoguang_01.lani
+   ../../res3d/Conventional/Assets/TextEffect/fx_Jietouhunhun_trail_001.png
+   ../../res3d/Conventional/Assets/TextEffect/fx_Jietouhunhun_trail_002.png
+   ../../res3d/Conventional/Assets/TextEffect/fx_Jietouhunhun_trail_003.png
+   ../../res3d/Conventional/Assets/TextEffect/fx_Jietouhunhun_trail_004.png
+   ../../res3d/Conventional/Assets/TextEffect/fx_Jietouhunhun_trail_005.png
+   ../../res3d/Conventional/Assets/TextEffect/fx_Jietouhunhun_glow_001.png
+   ../../res3d/Conventional/Effect_5001_Fathoody__attack02_01.lh
+   ../../res3d/Conventional/Assets/TextEffect/fx_004-Sphere001.lm
+   ../../res3d/Conventional/Assets/TextEffect/fx_005-Sphere002.lm
+   ../../res3d/Conventional/Assets/TextEffect/fx_Jietouhunhun_noise_001.lmat
+   ../../res3d/Conventional/Assets/TextEffect/fx_Jietouhunhun_smoke_003.lmat
+   ../../res3d/Conventional/Assets/TextEffect/fx_Jietouhunhun_qiliu_01-fx_Jietouhunhun_qiliu_01.lani
+   ../../res3d/Conventional/Assets/TextEffect/fx_Jietouhunhun_noise_001.png
+   ../../res3d/Conventional/Assets/TextEffect/fx_Jietouhunhun_smoke_003.png
+   ../../res3d/Conventional/Effect_5001_Fathoody__attack02_02.lh
+   ../../res3d/Conventional/Assets/TextEffect/fx_006-Plane001.lm
+   ../../res3d/Conventional/Assets/TextEffect/fx_Jietouhunhun_smoke_004.lmat
+   ../../res3d/Conventional/Assets/TextEffect/fx_Jietouhunhun_smoke_004_02.lmat
+   ../../res3d/Conventional/Assets/TextEffect/fx_Jietouhunhun_smoke_005.lmat
+   ../../res3d/Conventional/Assets/TextEffect/fx_Jietouhunhun_smoke_004.png
+   ../../res3d/Conventional/Assets/TextEffect/fx_Jietouhunhun_smoke_005.png
+   ../../res3d/Conventional/Effect_5001_Fathoody__skill01_01.lh
+   ../../res3d/Conventional/Assets/TextEffect/fx_003-Mesher003.lm
+   ../../res3d/Conventional/Assets/TextEffect/fx_007-Cylinder002.lm
+   ../../res3d/Conventional/Assets/TextEffect/fx_Jietouhunhun_trail_006.lmat
+   ../../res3d/Conventional/Assets/TextEffect/fx_Jietouhunhun_smoke_007.lmat
+   ../../res3d/Conventional/Assets/TextEffect/fx_Jietouhunhun_smoke_006.lmat
+   ../../res3d/Conventional/Assets/TextEffect/fx_Jietouhunhun_trail_006.png
+   ../../res3d/Conventional/Assets/TextEffect/fx_Jietouhunhun_smoke_007.png
+   ../../res3d/Conventional/Assets/TextEffect/fx_Jietouhunhun_smoke_006.png
+   ../../res3d/Conventional/Effect_5001_Fathoody__skill01_02.lh
+   ../../res3d/Conventional/Assets/TextEffect/fx_008-Cylinder001.lm
+   ../../res3d/Conventional/Assets/TextEffect/fx_Jietouhunhun_object_001.lmat
+   ../../res3d/Conventional/Assets/TextEffect/fx_Jietouhunhun_glow_001_02.lmat
+   ../../res3d/Conventional/Assets/TextEffect/fx_Jietouhunhun_smoke_009.lmat
+   ../../res3d/Conventional/Assets/TextEffect/fx_Jietouhunhun_smoke_008.lmat
+   ../../res3d/Conventional/Assets/TextEffect/fx_Jietouhunhun_object_002.lmat
+   ../../res3d/Conventional/Assets/TextEffect/fx_Jietouhunhun_trail_007.lmat
+   ../../res3d/Conventional/Assets/TextEffect/fx_Jietouhunhun_object_001.png
+   ../../res3d/Conventional/Assets/TextEffect/fx_Jietouhunhun_smoke_009.png
+   ../../res3d/Conventional/Assets/TextEffect/fx_Jietouhunhun_smoke_008.png
+   ../../res3d/Conventional/Assets/TextEffect/fx_Jietouhunhun_object_002.png
+   ../../res3d/Conventional/Assets/TextEffect/fx_Jietouhunhun_trail_007.png
+   ../../res3d/Conventional/Effect_5001_Fathoody__skill02_01.lh
+   ../../res3d/Conventional/Assets/TextEffect/fx_009-Sphere001.lm
+   ../../res3d/Conventional/Assets/TextEffect/fx_Jietouhunhun_noise_002.lmat
+   ../../res3d/Conventional/Assets/TextEffect/fx_Jietouhunhun_qiliu_02-fx_Jietouhunhun_qiliu_02.lani
+   ../../res3d/Conventional/Assets/TextEffect/fx_Jietouhunhun_noise_002.png
+   ../../res3d/Conventional/Effect_5001_Fathoody__skill02_02.lh
+   ../../res3d/Conventional/Effect_5001_Fathoody__skill03_01.lh
+   ../../res3d/Conventional/Assets/TextEffect/fx_Jietouhunhun_smoke_010.lmat
+   ../../res3d/Conventional/Assets/TextEffect/skill03_01-skill03_01.lani
+   ../../res3d/Conventional/Assets/TextEffect/fx_Jietouhunhun_smoke_010.png
+   ../../res3d/Conventional/Effect_5001_Fathoody__warning01_01.lh
+   ../../res3d/Conventional/Assets/TextEffect/mofang_mianpian-mofang_mianpian.lm
+   ../../res3d/Conventional/Assets/TextEffect/ef_zhugeliang_qiu_05_main3.lmat
+   ../../res3d/Conventional/Assets/TextEffect/Genkishi_shc_21.lmat
+   ../../res3d/Conventional/Assets/TextEffect/mofang_19.lmat
+   ../../res3d/Conventional/Assets/TextEffect/fxx_common_warning_01-fxx_common_warning_01.lani
+   ../../res3d/Conventional/Assets/TextEffect/guangquan.png
+   ../../res3d/Conventional/Assets/TextEffect/Genkishi_tex_glowquan.jpg
+   ../../res3d/Conventional/Assets/TextEffect/mf_gd_01.png
+   ../../res3d/Conventional/Effect_5001_Fathoody__warning02_01.lh
+=====================
+
+Effect_5001_Fathoody____Effect_5002_octopus_warning01_01， 数量=7
+   ../../res3d/Conventional/Assets/TextEffect/com,on_warning-common_warning_02.lm
+   ../../res3d/Conventional/Assets/TextEffect/common_warning_02_1-common_warning_02_1.lm
+   ../../res3d/Conventional/Assets/TextEffect/common_warning_02.lmat
+   ../../res3d/Conventional/Assets/TextEffect/common_warning_01.lmat
+   ../../res3d/Conventional/Assets/TextEffect/fxx_common_warning_02_1-fxx_common_warning_02_1.lani
+   ../../res3d/Conventional/Assets/TextEffect/common_warning_02.png
+   ../../res3d/Conventional/Assets/TextEffect/common_warning_01.png
+=====================
+
+Effect_5002_octopus_skill01_01， 数量=14
+   ../../res3d/Conventional/Effect_5002_octopus_skill01_01.lh
+   ../../res3d/Conventional/Assets/TextEffect/Momokyokai_mesh_banyuan-Plane004.lm
+   ../../res3d/Conventional/Assets/TextEffect/Octopus_shc_17.lmat
+   ../../res3d/Conventional/Assets/TextEffect/Octopus_shc_16.lmat
+   ../../res3d/Conventional/Assets/TextEffect/Octopus_shc_18.lmat
+   ../../res3d/Conventional/Assets/TextEffect/Octopus_shc_19.lmat
+   ../../res3d/Conventional/Assets/TextEffect/Octopus_shc_20.lmat
+   ../../res3d/Conventional/Assets/TextEffect/Octopus_shc_21.lmat
+   ../../res3d/Conventional/Assets/TextEffect/Octopus_shc_22.lmat
+   ../../res3d/Conventional/Assets/TextEffect/Octopus_tex_lie.png
+   ../../res3d/Conventional/Assets/TextEffect/Octopus_tex_dao.png
+   ../../res3d/Conventional/Assets/TextEffect/Momokyokai_tex_xianquan.png
+   ../../res3d/Conventional/Assets/TextEffect/Octopus_tex_glow.png
+   ../../res3d/Conventional/Assets/TextEffect/001_022.png
+=====================
+
+Effect_5002_octopus_warning01_01， 数量=1
+   ../../res3d/Conventional/Effect_5002_octopus_warning01_01.lh
+=====================
+
+Effect_Text_Arrow， 数量=3
+   ../../res3d/Conventional/Effect_Text_Arrow.lh
+   ../../res3d/Conventional/Assets/Go_Arrow.lmat
+   ../../res3d/Conventional/Assets/Go_Arrow.png
+=====================
+
+Effect_Text_Forward， 数量=5
+   ../../res3d/Conventional/Effect_Text_Forward.lh
+   ../../res3d/Conventional/Assets/Forward.lmat
+   ../../res3d/Conventional/Assets/lightning.lmat
+   ../../res3d/Conventional/Assets/icon_gogogo.png
+   ../../res3d/Conventional/Assets/lightning.png
+=====================
+
+Hero_0001_LongQi_Skin1， 数量=24
+   ../../res3d/Conventional/Hero_0001_LongQi_Skin1.lh
+   ../../res3d/Conventional/Assets/Data/Anim/Hero/Kyoya Hibari/Kyoya Hibari-Skin.lm
+   ../../res3d/Conventional/Assets/Data/Anim/Hero/Kyoya Hibari/kyoya.lmat
+   ../../res3d/Conventional/Assets/Data/Anim/Hero/Kyoya Hibari/kyoya_hibari@BEATTACKFLY-BEATTACKFLY.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Hero/Kyoya Hibari/kyoya_hibari@attack01-attack01.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Hero/Kyoya Hibari/kyoya_hibari@attack02-attack02.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Hero/Kyoya Hibari/kyoya_hibari@attack03-attack03.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Hero/Kyoya Hibari/kyoya_hibari@attack04-attack04.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Hero/Kyoya Hibari/kyoya_hibari@dash_01-dash_01.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Hero/Kyoya Hibari/kyoya_hibari@death_01-death_01.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Hero/Kyoya Hibari/kyoya_hibari@get_up-get_up.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Hero/Kyoya Hibari/kyoya_hibari@ground_behit_01-ground_behit_01.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Hero/Kyoya Hibari/kyoya_hibari@ground_behit_02-ground_behit_02.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Hero/Kyoya Hibari/kyoya_hibari@idle-idle.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Hero/Kyoya Hibari/kyoya_hibari@jump_01-jump_01.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Hero/Kyoya Hibari/kyoya_hibari@run_01-run_01.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Hero/Kyoya Hibari/kyoya_hibari@skill_01-skill_01.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Hero/Kyoya Hibari/kyoya_hibari@skill_02-skill_02.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Hero/Kyoya Hibari/kyoya_hibari@skill_03-skill_03.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Hero/Kyoya Hibari/kyoya_hibari@skill_ult_01-skill_ult_01.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Hero/Kyoya Hibari/kyoya_hibari@dodge_01-dodge_01.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Hero/Kyoya Hibari/kyoya_hibari@jump_attack_01-jump_attack_01.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Hero/Kyoya Hibari/kyoya_hibari@change_01-change_01.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Hero/Kyoya Hibari/Kyoya Hibari_01.jpg
+=====================
+
+Hero_0002_ZhanJi_Skin1， 数量=27
+   ../../res3d/Conventional/Hero_0002_ZhanJi_Skin1.lh
+   ../../res3d/Conventional/Assets/Data/Anim/Hero/Superbia_Squalo/superbia_squalo-Skin.lm
+   ../../res3d/Conventional/Assets/Data/Anim/Hero/Superbia_Squalo/superbia_squalo_material.lmat
+   ../../res3d/Conventional/Assets/Data/Anim/Hero/Superbia_Squalo/superbia_squalo@death-death.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Hero/Superbia_Squalo/superbia_squalo@get_up-get_up.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Hero/Superbia_Squalo/superbia_squalo@ground_behit_01-ground_behit_01.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Hero/Superbia_Squalo/superbia_squalo@ground_behit_02-ground_behit_02.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Hero/Superbia_Squalo/superbia_squalo@idle_01-idle_01.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Hero/Superbia_Squalo/superbia_squalo@jump_01-jump_01.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Hero/Superbia_Squalo/superbia_squalo@jump_attack_01-jump_attack_01.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Hero/Superbia_Squalo/superbia_squalo@lose_01-lose_01.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Hero/Superbia_Squalo/superbia_squalo@run_01-run_01.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Hero/Superbia_Squalo/superbia_squalo@skill_01-skill_01.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Hero/Superbia_Squalo/superbia_squalo@skill_02-skill_02.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Hero/Superbia_Squalo/superbia_squalo@skill_03-skill_03.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Hero/Superbia_Squalo/superbia_squalo@skill_ult_01-skill_ult_01.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Hero/Superbia_Squalo/superbia_squalo@stun-stun.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Hero/Superbia_Squalo/superbia_squalo@win_01-win_01.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Hero/Superbia_Squalo/superbia_squalo-Take 001.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Hero/Superbia_Squalo/superbia_squalo@air_throw_01-air_throw_01.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Hero/Superbia_Squalo/superbia_squalo@dash_01-dash_01.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Hero/Superbia_Squalo/superbia_squalo@attack_01-attack_01.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Hero/Superbia_Squalo/superbia_squalo@attack_02-attack_02.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Hero/Superbia_Squalo/superbia_squalo@attack_03-attack_03.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Hero/Superbia_Squalo/superbia_squalo@attack_04-attack_04.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Hero/Kyoya Hibari/kyoya_hibari@change-change.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Hero/Superbia_Squalo/superbia_squalo_01.jpg
+=====================
+
+Hero_1002_yamamototakeshi_Skin1， 数量=25
+   ../../res3d/Conventional/Hero_1002_yamamototakeshi_Skin1.lh
+   ../../res3d/Conventional/Assets/Data/Art/Models/Hero/yamamototakeshi/Bone/yamamoto_takeshi-Skin.lm
+   ../../res3d/Conventional/Assets/Data/Art/Models/Hero/yamamototakeshi/Bone/yamamoto_takeshi_material.lmat
+   ../../res3d/Conventional/Assets/Data/Art/Models/Hero/yamamototakeshi/Bone/yamamoto_takeshi@attack_01-attack_01.lani
+   ../../res3d/Conventional/Assets/Data/Art/Models/Hero/yamamototakeshi/Bone/yamamoto_takeshi@attack_02-attack_02.lani
+   ../../res3d/Conventional/Assets/Data/Art/Models/Hero/yamamototakeshi/Bone/yamamoto_takeshi@attack_03-attack_03.lani
+   ../../res3d/Conventional/Assets/Data/Art/Models/Hero/yamamototakeshi/Bone/yamamoto_takeshi@attack_04-attack_04.lani
+   ../../res3d/Conventional/Assets/Data/Art/Models/Hero/yamamototakeshi/Bone/yamamoto_takeshi@back_fall_down-back_fall_down.lani
+   ../../res3d/Conventional/Assets/Data/Art/Models/Hero/yamamototakeshi/Bone/yamamoto_takeshi@back_get_up-back_get_up.lani
+   ../../res3d/Conventional/Assets/Data/Art/Models/Hero/yamamototakeshi/Bone/yamamoto_takeshi@change-change.lani
+   ../../res3d/Conventional/Assets/Data/Art/Models/Hero/yamamototakeshi/Bone/yamamoto_takeshi@dash_01-dash_01.lani
+   ../../res3d/Conventional/Assets/Data/Art/Models/Hero/yamamototakeshi/Bone/yamamoto_takeshi@death_01-death_01.lani
+   ../../res3d/Conventional/Assets/Data/Art/Models/Hero/yamamototakeshi/Bone/yamamoto_takeshi@forward_body_behit-forward_body_behit.lani
+   ../../res3d/Conventional/Assets/Data/Art/Models/Hero/yamamototakeshi/Bone/yamamoto_takeshi@forward_body_behit_heavy-forward_body_behit_heavy.lani
+   ../../res3d/Conventional/Assets/Data/Art/Models/Hero/yamamototakeshi/Bone/yamamoto_takeshi@idle_01-idle_01.lani
+   ../../res3d/Conventional/Assets/Data/Art/Models/Hero/yamamototakeshi/Bone/yamamoto_takeshi@jump_01-jump_01.lani
+   ../../res3d/Conventional/Assets/Data/Art/Models/Hero/yamamototakeshi/Bone/yamamoto_takeshi@jump_attack_01-jump_attack_01.lani
+   ../../res3d/Conventional/Assets/Data/Art/Models/Hero/yamamototakeshi/Bone/yamamoto_takeshi@run-run.lani
+   ../../res3d/Conventional/Assets/Data/Art/Models/Hero/yamamototakeshi/Bone/yamamoto_takeshi@skill_01-skill_01.lani
+   ../../res3d/Conventional/Assets/Data/Art/Models/Hero/yamamototakeshi/Bone/yamamoto_takeshi@skill_02-skill_02.lani
+   ../../res3d/Conventional/Assets/Data/Art/Models/Hero/yamamototakeshi/Bone/yamamoto_takeshi@skill_03-skill_03.lani
+   ../../res3d/Conventional/Assets/Data/Art/Models/Hero/yamamototakeshi/Bone/yamamoto_takeshi@skill_ult_01-skill_ult_01.lani
+   ../../res3d/Conventional/Assets/Data/Art/Models/Hero/yamamototakeshi/Bone/yamamoto_takeshi@stun-stun.lani
+   ../../res3d/Conventional/Assets/Data/Art/Models/Hero/yamamototakeshi/Bone/yamamoto_takeshi@leave-leave.lani
+   ../../res3d/Conventional/Assets/Data/Art/Models/Hero/yamamototakeshi/Bone/Materials/yamamoto_takeshi_01.png
+=====================
+
+Main Camera， 数量=1
+   ../../res3d/Conventional/Main Camera.lh
+=====================
+
+Monster_2001_badstudent， 数量=19
+   ../../res3d/Conventional/Monster_2001_badstudent.lh
+   ../../res3d/Conventional/Assets/Data/Anim/Monster/bad_student/bad_student-Bad Student.lm
+   ../../res3d/Conventional/Assets/Resources/bad_student/Monster_1001_HuangJinBing_Skin1.lmat
+   ../../res3d/Conventional/Assets/Data/Anim/Monster/bad_student/bad_student-Take 001.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Monster/bad_student/bad_student@air_throw_01-air_throw_01.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Monster/bad_student/bad_student@attack_01_before-attack_01_before.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Monster/bad_student/bad_student@attack_02_before-attack_02_before.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Monster/bad_student/bad_student@born_01_before-born_01_before.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Monster/bad_student/bad_student@death_01-death_01.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Monster/bad_student/bad_student@get_up-get_up.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Monster/bad_student/bad_student@ground_behit_01-ground_behit_01.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Monster/bad_student/bad_student@ground_behit_02-ground_behit_02.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Monster/bad_student/bad_student@idle_01-idle_01.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Monster/bad_student/bad_student@run_01-run_01.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Monster/bad_student/bad_student@stun-stun.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Monster/bad_student/BadStudent@attack_01-attack_01.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Monster/bad_student/BadStudent@attack_02-attack_02.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Monster/bad_student/BadStudent@born_01-born_01.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Monster/bad_student/bad_student_01.jpg
+=====================
+
+Monster_5001_fathoody_Skin1， 数量=17
+   ../../res3d/Conventional/Monster_5001_fathoody_Skin1.lh
+   ../../res3d/Conventional/Assets/Data/Anim/Monster/fathoody/fathoody-Skin.lm
+   ../../res3d/Conventional/Assets/Data/Anim/Monster/fathoody/fathoody.lmat
+   ../../res3d/Conventional/Assets/Data/Anim/Monster/fathoody/fathoody@idle_01-idle_01.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Monster/fathoody/fathoody@air_throw_01-air_throw_01.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Monster/fathoody/fathoody@attack_01-attack_01.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Monster/fathoody/fathoody@attack_02-attack_02.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Monster/fathoody/fathoody@death_01-death_01.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Monster/fathoody/fathoody@ground_behit_01-ground_behit_01.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Monster/fathoody/fathoody@ground_behit_02-ground_behit_02.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Monster/fathoody/fathoody@get_up-get_up.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Monster/fathoody/fathoody@run_01-run_01.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Monster/fathoody/fathoody@skill_01-skill_01.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Monster/fathoody/fathoody@skill_02-skill_02.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Monster/fathoody/fathoody@born_01-born_01.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Monster/fathoody/fathoody@born_02-born_02.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Monster/fathoody/fathoody_01_main.png
+=====================
+
+Monster_5001_octopus_Skin1， 数量=10
+   ../../res3d/Conventional/Monster_5001_octopus_Skin1.lh
+   ../../res3d/Conventional/Assets/Data/Anim/Monster/octopus/Hero_1002_octpus_Skin1-Skin.lm
+   ../../res3d/Conventional/Assets/Data/Anim/Monster/octopus/octopus_material.lmat
+   ../../res3d/Conventional/Assets/Data/Anim/Monster/octopus/octopus@idle_01-idle_01.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Monster/octopus/octopus@behit_01-behit_01.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Monster/octopus/Hero_1002_octpus_Skin1-Take 001.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Monster/octopus/octopus@death_01-death_01.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Monster/octopus/octopus@skill_01-skill_01.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Monster/octopus/octopus@bron_01-bron_01.lani
+   ../../res3d/Conventional/Assets/Data/Anim/Monster/octopus/octopus_01_mian.jpg
+=====================
+
+Scene_PVE_001_001， 数量=13
+   ../../res3d/Conventional/Scene_PVE_001_001.lh
+   ../../res3d/Conventional/Assets/GameArt/Scene/Scene_PVE_001_001/Z3.lmat
+   ../../res3d/Conventional/Assets/GameArt/Scene/Scene_PVE_001_001/Z7.lmat
+   ../../res3d/Conventional/Assets/GameArt/Scene/Scene_PVE_001_001/Z2.lmat
+   ../../res3d/Conventional/Assets/GameArt/Scene/Scene_PVE_001_001/Z6.lmat
+   ../../res3d/Conventional/Assets/GameArt/Scene/Scene_PVE_001_001/Z1.lmat
+   ../../res3d/Conventional/Assets/GameArt/Scene/Scene_PVE_001_001/Z5.lmat
+   ../../res3d/Conventional/Assets/GameArt/Scene/Scene_PVE_001_001/Z3.png
+   ../../res3d/Conventional/Assets/GameArt/Scene/Scene_PVE_001_001/Z7.png
+   ../../res3d/Conventional/Assets/GameArt/Scene/Scene_PVE_001_001/Z2.png
+   ../../res3d/Conventional/Assets/GameArt/Scene/Scene_PVE_001_001/Z9.png
+   ../../res3d/Conventional/Assets/GameArt/Scene/Scene_PVE_001_001/Z1.png
+   ../../res3d/Conventional/Assets/GameArt/Scene/Scene_PVE_001_001/Z8.png
+=====================
+
+Scene_PVP_001_002， 数量=5
+   ../../res3d/Conventional/Scene_PVP_001_002.lh
+   ../../res3d/Conventional/Assets/GameArt/Scene/Scene_PVP_001_002/bg_ring_night_02.lmat
+   ../../res3d/Conventional/Assets/GameArt/Scene/Scene_PVP_001_002/bg_ring_night_01.lmat
+   ../../res3d/Conventional/Assets/GameArt/Scene/Scene_PVP_001_002/bg_ring_night_02.jpg
+   ../../res3d/Conventional/Assets/GameArt/Scene/Scene_PVP_001_002/bg_ring_night_04.png
+=====================
+

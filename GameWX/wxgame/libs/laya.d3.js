@@ -31024,7 +31024,7 @@
 	                throw new Error("Laya3D:unkonwn version.");
 	        }
 
-        urls.length = 0;
+        // urls.length = 0;
 	        var urlCount = urls.length;
 	        var totalProcessCount = urlCount + 1;
 	        var lmatWeight = 1 / totalProcessCount;

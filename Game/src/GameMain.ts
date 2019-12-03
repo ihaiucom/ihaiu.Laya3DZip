@@ -37,9 +37,27 @@ class GameMain
 		LayaExtendLogic();
 		Engine.init();
 		new GameLaunch().install();
+		// this.testAsync();
 
 	}
 
+	testAsync()
+	{
+		this.testFun1Async();
+	}
+
+	async testFun1Async()
+	{
+		console.log("testFun1Async Begin");
+		await this.testFun2Async();
+		console.log("testFun1Async End");
+	}
+
+	
+	async testFun2Async()
+	{
+		
+	}
 
 }
 

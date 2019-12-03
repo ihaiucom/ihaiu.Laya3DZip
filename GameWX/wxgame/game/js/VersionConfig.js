@@ -2,8 +2,9 @@ var VersionConfig =
 {
   AppVersion: "v1.00.00.00",
   UrlBasePath: 'http://192.168.100.205:8900/',
-  UrlBasePath: 'http://192.168.100.205:8902/bin/',
+  UrlBasePath: 'http://192.168.100.205:8900/bin/',
   // UrlBasePath: 'http://gidea.ihaiu.com/wxjjsg.client_verres/testlaya/web/',
+  UrlBasePath: 'http://gidea.ihaiu.com/wxjjsg.client_verres/testlaya/testzip/',
 
   // 国内CDN
   // UrlBasePath: 'https://h5-jjsg-cdn.123u.com/testlaya/web/',

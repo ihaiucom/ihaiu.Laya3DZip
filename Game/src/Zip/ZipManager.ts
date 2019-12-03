@@ -2,6 +2,8 @@ import AssetManifest from "./AssetManifest";
 import ZipLoader from "./ZipLoader";
 import JsZipAsync from "./JsZipAsync";
 import { EnumZipAssetDataType } from "./ZipEnum";
+import DebugResources from "../DebugResources/DebugResources";
+import AsyncUtil from "./AsyncUtil";
 
 export default class ZipManager
 {
@@ -23,9 +25,17 @@ export default class ZipManager
     /** 资源清单 */
     manifest:AssetManifest;
 
+    static enable: boolean = false;
+
     /** 初始化 */
-    async InitAsync(manifestPath:string, srcRootPath: string, zipRootPath: string, zipExt?:string)
+    async InitAsync(manifestPath:string, srcRootPath: string, zipRootPath: string, zipExt?:string, isReplace?: boolean)
     {
+        if(this.manifest && !isReplace)
+        {
+            console.log("已经初始了Zip资源清单");
+            return;
+        }
+
         if(zipExt)
         {
             this.zipExt = zipExt;
@@ -34,6 +44,7 @@ export default class ZipManager
 
         await AssetManifest.InitAsync(manifestPath, srcRootPath,zipRootPath, zipExt);
         this.manifest = AssetManifest.Instance;
+        ZipManager.enable = true;
         this.InitCode();
     }
 
@@ -49,16 +60,52 @@ export default class ZipManager
     /** 资源数据 */
     assetMap:Map<string, any> = new Map<string, any>();
 
+    HasZip(zipPath:string)
+    {
+        return this.zipMap.has(zipPath);
+    }
+    
+    HasAsset(assetPath:string)
+    {
+        return this.assetMap.has(assetPath);
+    }
+
     /** 资源Url 转 路径 */
     AssetUrlToPath(url:string): string
     {
         return url.replace(Laya.URL.basePath, "");
+    }
+    /** 资源Url 转 资源名称 */
+    AssetUrlToName(url:string): string
+    {
+        let assetPath = this.AssetUrlToPath(url);
+        let assetName = this.manifest.GetAssetNameByPath(assetPath);
+        return assetName;
     }
 
     /** 资源名称转资源路径 */
     AssetNameToPath(assetName:string): string
     {
         return this.manifest.srcRootPath + assetName;
+    }
+
+    /** 资源ID转资源路径 */
+    ResFileNameToAssetPath(resId:string): string
+    {
+        return this.manifest.srcRootPath + resId + ".lh";
+    }
+
+    /** 资源路径列表 转 资源名称列表 */
+    AssetPathListToAssetNameList(assetPathList:string[]):string[]
+    {
+        let assetNameList:string[] = [];
+        for(let assetPath of assetPathList)
+        {
+            let assetName = this.manifest.GetAssetNameByPath(assetPath);
+            assetNameList.push(assetName);
+        }
+
+        return assetNameList;
     }
 
 
@@ -90,7 +137,7 @@ export default class ZipManager
         if(type == EnumZipAssetDataType.base64)
         {
             this.loadImageCount ++;
-            console.log(this.loadImageCount, assetPath);
+            // console.log(this.loadImageCount, assetPath);
         }
 
         if(this.assetMap.has(assetPath))
@@ -112,7 +159,7 @@ export default class ZipManager
         if(type == EnumZipAssetDataType.base64)
         {
             this.loadImageCount ++;
-            console.log(this.loadImageCount, assetPath);
+            // console.log(this.loadImageCount, assetPath);
         }
 
         if(this.assetMap.has(assetPath))
@@ -151,18 +198,9 @@ export default class ZipManager
     }
 
     /** 加载资源用到的所有Zip */
-    public async LoadAssetZipListAsync(assetUrlList: string[], callbacker?:any, onProgerss?:((i, count, rate, path)=>any))
+    public async LoadAssetZipListAsync(assetPathList: string[], callbacker?:any, onProgerss?:((i, count, rate, path)=>any))
     {
-        let assetPathList:string[] = [];
-        let assetNameList:string[] = [];
-        for(let url of assetUrlList)
-        {
-            let assetPath = this.AssetUrlToPath(url);
-            assetPathList.push(assetPath);
-
-            let assetName = this.manifest.GetAssetNameByPath(assetPath);
-            assetNameList.push(assetName);
-        }
+        let assetNameList:string[] = this.AssetPathListToAssetNameList(assetPathList);
 
         
         var progerssFun = (i, len, path)=>
@@ -189,12 +227,24 @@ export default class ZipManager
             progerssFun(0, zipPathList.length, "");
             var loadNum = 0;
             var loadTotal = zipPathList.length;
+            if(loadTotal == 0)
+            {
+                AsyncUtil.ResolveDelayCall(resolve);
+                return;
+            }
+
             for(let i = 0, len = zipPathList.length; i < len; i ++)
             {
                 let zipPath = zipPathList[i];
 
                 if(this.zipMap.has(zipPath))
                 {
+                    loadNum ++;
+                    progerssFun(loadNum, loadTotal, zipPath);
+                    if(loadNum >= loadTotal)
+                    {
+                        AsyncUtil.ResolveDelayCall(resolve);
+                    }
                     continue;
                 }
                 else
@@ -207,6 +257,7 @@ export default class ZipManager
                         if(loadNum >= loadTotal)
                         {
                             resolve();
+                            // ZipManager.ResolveDelayCall(resolve);
                         }
                     })
                 }
@@ -259,7 +310,7 @@ export default class ZipManager
 
             progerssFun(0, zipPathList.length, "");
 
-            var assetNameCount = 0;
+            var assetNameTotal = 0;
             var assetNameLoadedCount = 0;
             var zipAssetNameListMap:Map<string, string[]> = new Map<string, string[]>();
             for(let i = 0, len = zipPathList.length; i < len; i ++)
@@ -283,11 +334,18 @@ export default class ZipManager
                         }
 
                         assetNameList.push(assetName);
-                        assetNameCount ++;
+                        assetNameTotal ++;
                     }
                 }
 
                 zipAssetNameListMap.set(zipPath, assetNameList);
+            }
+
+            console.log("assetNameTotal=", assetNameTotal);
+            if(assetNameTotal == 0)
+            {
+                AsyncUtil.ResolveDelayCall(resolve);
+                return;
             }
 
 
@@ -325,12 +383,12 @@ export default class ZipManager
                         
                         this.assetMap.set(assetPath, data);
 
-                        progerssFun(assetNameLoadedCount, assetNameCount, zipPath);
+                        progerssFun(assetNameLoadedCount, assetNameTotal, zipPath);
                         subProgerssFun(j, jLen, assetName);
 
-                        if(assetNameLoadedCount >= assetNameCount)
+                        if(assetNameLoadedCount >= assetNameTotal)
                         {
-                            resolve();
+                            AsyncUtil.ResolveDelayCall(resolve);
                         }
                     })
                 }
@@ -344,6 +402,8 @@ export default class ZipManager
 		});
         
     }
+
+
 
 
 }

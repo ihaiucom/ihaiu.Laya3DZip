@@ -101,13 +101,14 @@ export default class ZipLoader
         var data =  ZipManager.Instance.GetAssetData(url);
         if(data)
         {
-            console.log("_loadHttpRequest ", url);
+            // console.log("_loadHttpRequest ", url);
+            if(onProcess) onProcess.call(onLoadCaller, 1);
             onLoad.call(onLoadCaller, data)
             return;
         }
         else
         {
-            console.log("src_loadHttpRequest ", url);
+            // console.log("src_loadHttpRequest ", url);
             this.src_loadHttpRequest(url, contentType, onLoadCaller, onLoad, onProcessCaller, onProcess, onErrorCaller, onError);
         }
 
@@ -125,12 +126,12 @@ export default class ZipLoader
         var data =  ZipManager.Instance.GetAssetData(url);
         if(data)
         {
-            console.log("_loadHtmlImage ", url);
+            // console.log("_loadHtmlImage ", url);
             this.src_loadHtmlImage(data, onLoadCaller, onLoad, onErrorCaller, onError)
         }
         else
         {
-            console.log("src_loadHtmlImage ", url);
+            // console.log("src_loadHtmlImage ", url);
             this.src_loadHtmlImage(url, onLoadCaller, onLoad, onErrorCaller, onError) 
         }
     }

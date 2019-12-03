@@ -32,8 +32,9 @@ export default class AssetManifest
     protected assetName2DependencieZipPaths:DictionaryObject<string, string[]> | any = {};
 
     
-    protected assetName2DependencieAssets:DictionaryObject<string, string[]> | any = {};
-    protected zipName2DependencieAssets:DictionaryObject<string, string[]> | any = {};
+    protected assetName2DependencieAssetNames:DictionaryObject<string, string[]> | any = {};
+    protected assetName2DependencieAssetPaths:DictionaryObject<string, string[]> | any = {};
+    protected zipName2DependencieAssetNames:DictionaryObject<string, string[]> | any = {};
 
     SetJson(json:any)
     {
@@ -64,15 +65,16 @@ export default class AssetManifest
         for(let assetId in this.assetId2Name)
         {
             let assetName = this.assetId2Name[assetId];
-            this.assetName2Id[assetName] = assetId;
+            this.assetName2Id[assetName] = parseInt(assetId) ;
         }
 
         for(let zipId in this.zipAssets)
         {
+            let zipIdInt = parseInt(zipId)
             let assetIdList = this.zipAssets[zipId];
             for(let id of assetIdList)
             {
-                this.assetId2ZipId[id] = zipId;
+                this.assetId2ZipId[id] = zipIdInt ;
             }
         }
 
@@ -94,11 +96,14 @@ export default class AssetManifest
         for(let assetId in this.assetsDependencie)
         {
             var assetName = this.GetAssetName(assetId);
-            var assetNames = this.assetName2DependencieAssets[assetName] = [];
+            var assetNames = this.assetName2DependencieAssetNames[assetName] = [];
+            var assetPaths = this.assetName2DependencieAssetPaths[assetName] = [];
             var dependenceAssetIdList = this.assetsDependencie[assetId];
             for(let itemAssetId of dependenceAssetIdList)
             {
-                assetNames.push(this.GetAssetName(itemAssetId));
+                let itemAssetName = this.GetAssetName(itemAssetId);
+                assetNames.push(itemAssetName);
+                assetPaths.push(this.GetAssetPathByAssetName(itemAssetName));
             }
         }
 
@@ -106,7 +111,7 @@ export default class AssetManifest
         for(let zipId in this.zipAssets)
         {
             var zipName = this.GetZipName(zipId);
-            var assetNames = this.zipName2DependencieAssets[zipName] = [];
+            var assetNames = this.zipName2DependencieAssetNames[zipName] = [];
             var dependenceAssetIdList = this.zipAssets[zipId];
             for(let itemAssetId of dependenceAssetIdList)
             {
@@ -132,6 +137,14 @@ export default class AssetManifest
     {
         var assetName:string = assetPath.replace(this.srcRootPath, "");
         return assetName;
+    }
+    
+    
+    /** 获取资源路径, 根据AssetName */
+    GetAssetPathByAssetName(assetName: string):string
+    {
+        var assetPath:string = this.srcRootPath + assetName;
+        return assetPath;
     }
 
     /** 获取资源所在Zip Id */
@@ -200,6 +213,31 @@ export default class AssetManifest
         }
         return assetId;
     }
+
+     /** 获取资源依赖的 AssetName名称列表 */
+     GetAssetDependencieNameList(asset:AssetIdOrName):string[]
+     {
+        let assetId:number = this.ToAssetId(asset);
+        let assetName:string = this.GetAssetName(assetId);
+        var assetNames = this.assetName2DependencieAssetNames[assetName];
+        return assetNames;
+     }
+     
+     /** 获取资源依赖的 AssetName名称列表 */
+     GetAssetDependenciePathList(asset:AssetIdOrName):string[]
+     {
+        let assetId:number = this.ToAssetId(asset);
+        let assetName:string = this.GetAssetName(assetId);
+        var assetPaths = this.assetName2DependencieAssetPaths[assetName];
+        return assetPaths;
+     }
+     
+     /** 获取资源依赖的 AssetName名称列表 */
+     GetAssetDependenciePathListByAssetPath(assetPath:string):string[]
+     {
+        let assetName = this.GetAssetNameByPath(assetPath);
+        return this.GetAssetDependenciePathList(assetName);
+     }
 
     private tmpMap:Map<string, any> = new Map<string, any>();
     /** 获取资源依赖的Zip 名称列表 */

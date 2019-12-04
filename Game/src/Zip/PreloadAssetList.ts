@@ -15,8 +15,8 @@ export default class PreloadAssetList
         this.assetPathList = assetPathList;
         this.loadIndex = 0;
         this.total = assetPathList.length;
-        this.maxLoader = Laya.loader.maxLoader - 2;
-        this.maxLoader = Math.min(this.maxLoader, 2);
+        this.maxLoader = Laya.loader.maxLoader - 1;
+        this.maxLoader = Math.max(this.maxLoader, 2);
     }
 
     get IsWait(): boolean
@@ -44,7 +44,7 @@ export default class PreloadAssetList
             return;
         }
         
-        let onceNum = 3;
+        let onceNum = 5;
         
         while(this.loadIndex < this.total)
         {

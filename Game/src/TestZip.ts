@@ -5,6 +5,7 @@ import R from "./R";
 import DebugResources from "./DebugResources/DebugResources";
 import PrefabManager from "./Zip/PrefablManager";
 import AsyncUtil from "./Zip/AsyncUtil";
+import ZipLoader from "./Zip/ZipLoader";
 export default class TestZip
 {
     scene: Laya.Scene3D;
@@ -60,9 +61,6 @@ export default class TestZip
         // "Scene_PVE_001_001",
         "Hero_0001_LongQi_Skin1",
         "Hero_1002_yamamototakeshi_Skin1",
-        "Monster_2001_badstudent",
-        "Monster_5001_fathoody_Skin1",
-        "Monster_5001_octopus_Skin1",
         "Effect_1001_Kyoya_Skin1__ATTACK0",
         "Effect_1001_Kyoya_Skin1__ATTACK1",
         "Effect_1001_Kyoya_Skin1__ATTACK2",
@@ -121,6 +119,9 @@ export default class TestZip
         "Effect_1002_yamamototakeshi_Skin1__EFFECT5",
         "Effect_1002_yamamototakeshi_Skin1__EFFECT5_01",
         "Effect_1002_yamamototakeshi_Skin1__EFFECT5_02",
+        "Monster_2001_badstudent",
+        "Monster_5001_fathoody_Skin1",
+        "Monster_5001_octopus_Skin1",
         "Effect_5001_Fathoody__warning01_01",
         "Effect_5001_Fathoody__skill01_02",
         "Effect_5001_Fathoody__warning02_01",
@@ -139,6 +140,7 @@ export default class TestZip
     {
         var beginTime = new Date().getTime();
         await ZipManager.Instance.InitAsync(R.res3dzip_manifest, R.res3d, R.res3dzip);
+        ZipLoader.UseAsync = false;
         var useTime = new Date().getTime() - beginTime;
         this.textTime.text += "manifest:" + useTime + "ms\n";
 

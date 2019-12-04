@@ -120,6 +120,21 @@ export default class AssetManifest
         }
     }
 
+    
+    /** 资源清单是否存在该资源 */
+    HasAsset(assetName:string):boolean
+    {
+        return this.GetAssetId(assetName) != undefined;
+    }
+
+    
+    /** 资源清单是否存在该资源, 根据路径 */
+    HasAssetByPath(assetPath: string):boolean
+    {
+        var assetName:string =this.GetAssetNameByPath(assetPath);
+        return this.HasAsset(assetName);
+    }
+
     /** 获取资源ID */
     GetAssetId(assetName:string):number
     {

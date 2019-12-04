@@ -131,6 +131,10 @@ export default class ZipManager
     public GetAssetData(url:string): any
     {
         var assetPath:string = this.AssetUrlToPath(url);
+        if(!this.manifest.HasAssetByPath(assetPath))
+        {
+            return null;
+        }
         var data:any;
         
         let type = this.manifest.GetEnumZipAssetDataType(assetPath);
@@ -153,6 +157,11 @@ export default class ZipManager
     public async GetAssetDataAsync(url:string): Promise<any>
     {
         var assetPath:string = this.AssetUrlToPath(url);
+        if(!this.manifest.HasAssetByPath(assetPath))
+        {
+            return null;
+        }
+        
         var data:any;
         
         let type = this.manifest.GetEnumZipAssetDataType(assetPath);
@@ -180,6 +189,8 @@ export default class ZipManager
     private async LoadAssetData(assetPath:string): Promise<any>
     {
         let assetName = this.manifest.GetAssetNameByPath(assetPath);
+        
+
         let zipPath = this.manifest.GetAssetZipPath(assetName);
         let type = this.manifest.GetEnumZipAssetDataType(assetName);
         let zip = await this.GetZipAsync(zipPath);

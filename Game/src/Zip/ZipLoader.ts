@@ -2,6 +2,7 @@ import ZipManager from "./ZipManager";
 
 export default class ZipLoader 
 {
+    static UseAsync:boolean = true;
     static InitCode()
     {
         new ZipLoader().InitCode();
@@ -89,7 +90,7 @@ export default class ZipLoader
 
     }
 
-    private  _loadHttpRequest(url, contentType, onLoadCaller:ZipLoader, onLoad:Function, onProcessCaller, onProcess, onErrorCaller, onError)
+    private async _loadHttpRequest(url, contentType, onLoadCaller:ZipLoader, onLoad:Function, onProcessCaller, onProcess, onErrorCaller, onError)
     {
         var ext =  Laya.Utils.getFileExtension(url);
         if(ext == "zip")
@@ -98,7 +99,16 @@ export default class ZipLoader
             return;
         }
 
-        var data =  ZipManager.Instance.GetAssetData(url);
+        var data:any;
+        if(ZipLoader.UseAsync)
+        {
+            data =  await ZipManager.Instance.GetAssetDataAsync(url);
+        }
+        else
+        {
+            data =  ZipManager.Instance.GetAssetData(url);
+        }
+
         if(data)
         {
             // console.log("_loadHttpRequest ", url);
@@ -120,10 +130,20 @@ export default class ZipLoader
 
     }
 
-    private _loadHtmlImage(url:string, onLoadCaller, onLoad, onErrorCaller, onError) 
+    private async _loadHtmlImage(url:string, onLoadCaller, onLoad, onErrorCaller, onError) 
     {
         
-        var data =  ZipManager.Instance.GetAssetData(url);
+        var data:any;
+        if(ZipLoader.UseAsync)
+        {
+            data =  await ZipManager.Instance.GetAssetDataAsync(url);
+        }
+        else
+        {
+            data =  ZipManager.Instance.GetAssetData(url);
+        }
+
+        
         if(data)
         {
             // console.log("_loadHtmlImage ", url);

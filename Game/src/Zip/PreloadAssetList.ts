@@ -75,12 +75,12 @@ export default class PreloadAssetList
     
                 if(i < onceNum - 1)
                 {
-                    console.log("Preload Load sync", i, assetPath);
+                    // console.log("Preload Load sync", i, assetPath);
                     AsyncUtil.Load3D(assetPath);
                 }
                 else
                 {
-                    console.log("Preload Load async", i, assetPath);
+                    // console.log("Preload Load async", i, assetPath);
                     await AsyncUtil.Load3DAsync(assetPath);
                 }
                 this.loadIndex ++;

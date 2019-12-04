@@ -150,7 +150,8 @@ CompressedObject.prototype = {
      * @return {GenericWorker} the worker.
      */
     getContentWorker : function () {
-        var worker = new DataWorker(external.Promise.resolve(this.compressedContent))
+      // TODO ZF
+        var worker = new DataWorker(external.Promise.resolve(this.compressedContent), this.compressedContent)
         .pipe(this.compression.uncompressWorker())
         .pipe(new DataLengthProbe("data_length"));
 
@@ -2133,7 +2134,7 @@ var DEFAULT_BLOCK_SIZE = 16 * 1024;
  * @constructor
  * @param {Promise} dataP the promise of the data to split
  */
-function DataWorker(dataP) {
+function DataWorker(dataP, data) {
     GenericWorker.call(this, "DataWorker");
     var self = this;
     this.dataIsReady = false;
@@ -2144,15 +2145,26 @@ function DataWorker(dataP) {
 
     this._tickScheduled = false;
 
-    dataP.then(function (data) {
-        self.dataIsReady = true;
-        self.data = data;
-        self.max = data && data.length || 0;
-        self.type = utils.getTypeOf(data);
-        if(!self.isPaused) {
-            self._tickAndRepeat();
-        }
-    }, function (e) {
+    var setData=(data)=>
+    {
+      self.dataIsReady = true;
+      self.data = data;
+      self.max = data && data.length || 0;
+      self.type = utils.getTypeOf(data);
+      if(!self.isPaused) {
+          self._tickAndRepeat();
+      }
+    }
+
+
+    // TODO ZF
+    if(data)
+    {
+      setData(data);
+      return;
+    }
+
+    dataP.then(setData, function (e) {
         self.error(e);
     });
 }

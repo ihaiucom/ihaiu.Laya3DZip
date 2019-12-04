@@ -67,7 +67,7 @@ export default class PreloadZipList
             }
 
             let zipPath = this.zipPathList[this.loadIndex];
-            console.log("Preload Zip", zipPath);
+            // console.log("Preload Zip", zipPath);
             await ZipManager.Instance.GetZipAsync(zipPath);
             this.loadIndex ++;
             if(this.isStop)
@@ -105,12 +105,12 @@ export default class PreloadZipList
                 let assetPath = this.assetPathList[this.unzipIndex];
                 if(i < onceNum - 1)
                 {
-                    console.log("Preload Read sync", i, assetPath);
+                    // console.log("Preload Read sync", i, assetPath);
                     ZipManager.Instance.GetAssetDataAsync(assetPath)
                 }
                 else
                 {
-                    console.log("Preload Read async", i, assetPath);
+                    // console.log("Preload Read async", i, assetPath);
                     await ZipManager.Instance.GetAssetDataAsync(assetPath)
                 }
                 this.unzipIndex ++;

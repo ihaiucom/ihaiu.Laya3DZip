@@ -428,24 +428,9 @@
             });
         }
         static read(zip, path, type, callbacker, onComponent) {
-            let p = zip.file(path).async(type);
-            let a = setTimeout(() => {
-                p.then((data) => {
-                    if (onComponent) {
-                        onComponent.call(callbacker, data);
-                    }
-                });
-            }, 100);
-            p.then((data) => {
-                clearTimeout(a);
+            zip.file(path).async(type).then((data) => {
                 if (onComponent) {
                     onComponent.call(callbacker, data);
-                }
-            }, (r) => {
-                clearTimeout(a);
-                console.warn(path, r);
-                if (onComponent) {
-                    onComponent.call(callbacker, null);
                 }
             }).catch((error) => {
                 console.error(error);
@@ -1098,7 +1083,6 @@
                     break;
                 }
                 let zipPath = this.zipPathList[this.loadIndex];
-                console.log("Preload Zip", zipPath);
                 await ZipManager.Instance.GetZipAsync(zipPath);
                 this.loadIndex++;
                 if (this.isStop) {
@@ -1123,11 +1107,9 @@
                     }
                     let assetPath = this.assetPathList[this.unzipIndex];
                     if (i < onceNum - 1) {
-                        console.log("Preload Read sync", i, assetPath);
                         ZipManager.Instance.GetAssetDataAsync(assetPath);
                     }
                     else {
-                        console.log("Preload Read async", i, assetPath);
                         await ZipManager.Instance.GetAssetDataAsync(assetPath);
                     }
                     this.unzipIndex++;
@@ -1182,11 +1164,9 @@
                     }
                     let assetPath = this.assetPathList[this.loadIndex];
                     if (i < onceNum - 1) {
-                        console.log("Preload Load sync", i, assetPath);
                         AsyncUtil.Load3D(assetPath);
                     }
                     else {
-                        console.log("Preload Load async", i, assetPath);
                         await AsyncUtil.Load3DAsync(assetPath);
                     }
                     this.loadIndex++;
@@ -1304,6 +1284,78 @@
             this.list = [
                 "Hero_0001_LongQi_Skin1",
                 "Hero_1002_yamamototakeshi_Skin1",
+                "Monster_2001_badstudent",
+                "Monster_5001_fathoody_Skin1",
+                "Monster_5001_octopus_Skin1",
+                "Effect_1001_Kyoya_Skin1__ATTACK0",
+                "Effect_1001_Kyoya_Skin1__ATTACK1",
+                "Effect_1001_Kyoya_Skin1__ATTACK2",
+                "Effect_1001_Kyoya_Skin1__ATTACK3",
+                "Effect_1001_Kyoya_Skin1__EFFECT1_03",
+                "Effect_1001_Kyoya_Skin1__EFFECT1_03_w",
+                "Effect_1001_Kyoya_Skin1__EFFECT1_04",
+                "Effect_1001_Kyoya_Skin1__EFFECT1_05",
+                "Effect_1001_Kyoya_Skin1__EFFECT1_06",
+                "Effect_1001_Kyoya_Skin1__EFFECT1_07",
+                "Effect_1001_Kyoya_Skin1__EFFECT2_02",
+                "Effect_1001_Kyoya_Skin1__EFFECT2_03",
+                "Effect_1001_Kyoya_Skin1__EFFECT3_01",
+                "Effect_1001_Kyoya_Skin1__EFFECT3_01_w",
+                "Effect_1001_Kyoya_Skin1__EFFECT3_02",
+                "Effect_1001_Kyoya_Skin1__EFFECT3_02_w",
+                "Effect_1001_Kyoya_Skin1__EFFECT3_03",
+                "Effect_1001_Kyoya_Skin1__EFFECT3_03_w",
+                "Effect_1001_Kyoya_Skin1__EFFECT3_04",
+                "Effect_1001_Kyoya_Skin1__EFFECT3_04_w",
+                "Effect_1001_Kyoya_Skin1__EFFECT3_05",
+                "Effect_1001_Kyoya_Skin1__EFFECT3_05_w",
+                "Effect_1001_Kyoya_Skin1__EFFECT4_10",
+                "Effect_1001_Kyoya_Skin1__EFFECT4_02",
+                "Effect_1001_Kyoya_Skin1__EFFECT4_02_w",
+                "Effect_1001_Kyoya_Skin1__EFFECT4_03",
+                "Effect_1001_Kyoya_Skin1__EFFECT4_03_w",
+                "Effect_1001_Kyoya_Skin1__EFFECT4_04",
+                "Effect_1001_Kyoya_Skin1__EFFECT4_04_w",
+                "Effect_1001_Kyoya_Skin1__EFFECT4_05",
+                "Effect_1001_Kyoya_Skin1__EFFECT4_05_w",
+                "Effect_1001_Kyoya_Skin1__EFFECT4_06",
+                "Effect_1001_Kyoya_Skin1__EFFECT4_06_w",
+                "Effect_1001_Kyoya_Skin1__EFFECT4_07",
+                "Effect_1001_Kyoya_Skin1__EFFECT4_07_01",
+                "Effect_1001_Kyoya_Skin1__EFFECT4_07_w",
+                "Effect_1001_Kyoya_Skin1__EFFECT4_08",
+                "Effect_1001_Kyoya_Skin1__EFFECT4_09",
+                "Effect_1001_Kyoya_Skin1__RUN_ATTACK0",
+                "Effect_1001_Kyoya_Skin1__JUMP_ATTACK0",
+                "Effect_1002_yamamototakeshi_Skin1__ATTACK0",
+                "Effect_1002_yamamototakeshi_Skin1__ATTACK1",
+                "Effect_1002_yamamototakeshi_Skin1__ATTACK2",
+                "Effect_1002_yamamototakeshi_Skin1__ATTACK3",
+                "Effect_1002_yamamototakeshi_Skin1__JUMP_ATTACK0",
+                "Effect_1002_yamamototakeshi_Skin1__JUMP_ATTACK0_01",
+                "Effect_1002_yamamototakeshi_Skin1_RUN_ATTACK0",
+                "Effect_1002_yamamototakeshi_Skin1_RUN_ATTACK0_01",
+                "Effect_1002_yamamototakeshi_Skin1__EFFECT1",
+                "Effect_1002_yamamototakeshi_Skin1__EFFECT1_02",
+                "Effect_1002_yamamototakeshi_Skin1__EFFECT1_01",
+                "Effect_1002_yamamototakeshi_Skin1__EFFECT2",
+                "Effect_1002_yamamototakeshi_Skin1__EFFECT2_01",
+                "Effect_1002_yamamototakeshi_Skin1__EFFECT4_03",
+                "Effect_1002_yamamototakeshi_Skin1__EFFECT4_04",
+                "Effect_1002_yamamototakeshi_Skin1__EFFECT5",
+                "Effect_1002_yamamototakeshi_Skin1__EFFECT5_01",
+                "Effect_1002_yamamototakeshi_Skin1__EFFECT5_02",
+                "Effect_5001_Fathoody__warning01_01",
+                "Effect_5001_Fathoody__skill01_02",
+                "Effect_5001_Fathoody__warning02_01",
+                "Effect_5001_Fathoody__attack02_01",
+                "Effect_5001_Fathoody__attack01_01",
+                "Effect_000_BehitCommon__Behit",
+                "Effect_Text_Forward",
+                "Effect_Text_Arrow",
+                "Effect_000_Circle__Other",
+                "Effect_000_Circle__Self",
+                "Effect_13001_fade"
             ];
             this.prefabList = [];
             window['test'] = this;

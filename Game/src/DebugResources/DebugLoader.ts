@@ -40,7 +40,7 @@ export default class DebugLoader
     onError(message) 
     {
         DebugResources.onLoadError(this.url);
-        this.onError(message);
+        this.src_onError(message);
     }
 
 

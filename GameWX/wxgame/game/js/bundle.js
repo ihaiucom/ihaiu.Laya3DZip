@@ -1390,7 +1390,7 @@
       this.textTime.text += "manifest:" + useTime + "ms\n";
       PrefabManager.Instance.Init(R.res3d);
       var beginTime = new Date().getTime();
-      await PrefabManager.Instance.PreloadPrefabList(this.list);
+      // await PrefabManager.Instance.PreloadPrefabList(this.list);
       var useTime = new Date().getTime() - beginTime;
       this.textTime.text += "PreloadPrefabList:" + useTime + "ms\n";
       this.testLoad();

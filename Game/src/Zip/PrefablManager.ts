@@ -126,6 +126,12 @@ export default class PrefabManager
                 continue;
             }
 
+            if(!manifest.HasAssetByPath(assetPath))
+            {
+                console.warn("Zip 文件清单中不存在资源", assetPath);
+                continue;
+            }
+
 
             let dependencieAssetPathList:string[] = manifest.GetAssetDependenciePathListByAssetPath(assetPath);
             for(let dependencieAssetPath of dependencieAssetPathList)
@@ -156,7 +162,10 @@ export default class PrefabManager
         this.preloadAsset = new PreloadAssetList(assetPathList);
 
         await this.preloadZip.StartAsync();
-        await this.preloadAsset.StartAsync();
+        if(this.preloadAsset)
+        {
+            await this.preloadAsset.StartAsync();
+        }
        
     }
 }

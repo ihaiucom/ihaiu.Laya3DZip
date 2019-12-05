@@ -41,6 +41,24 @@ class GameMain
 
 	}
 
+	initLoader() 
+	{
+
+		let path = "res/fgui/GameLaunch_atlas_upoiw2g.jpg";
+  
+		let system = wx.getSystemInfoSync()
+		var sprite = new Laya.Sprite();
+		let w = Laya.stage.width;
+		let h = Laya.stage.height;
+  
+  
+		sprite.graphics.drawRect(0, 0, w, h, '#FFFFFF');
+		sprite.graphics.loadImage(path, 0, 0, w, h);
+		Laya.stage.addChild(sprite);
+		window['launcherInitBG'] = sprite;
+  
+	}
+
 	testAsync()
 	{
 		this.testFun1Async();

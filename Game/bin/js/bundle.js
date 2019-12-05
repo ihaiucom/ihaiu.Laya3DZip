@@ -463,10 +463,30 @@
     }
     window['AsyncUtil'] = AsyncUtil;
 
+    class ZipLoaderManager {
+        static InitCode() {
+            new ZipLoaderManager().InitCode();
+        }
+        InitCode() {
+            var LoaderManager = Laya.LoaderManager;
+            LoaderManager.prototype.src_doLoad = LoaderManager.prototype._doLoad;
+            LoaderManager.prototype._doLoad = this._doLoad;
+        }
+        src_doLoad(resInfo) {
+        }
+        _doLoad(resInfo) {
+            if (ZipManager.enable) {
+                var has = ZipManager.Instance.manifest.HasAssetByPath(resInfo.url);
+            }
+            this.src_doLoad(resInfo);
+        }
+    }
+
     class ZipManager {
         constructor() {
             this.zipExt = ".zip";
             this.zipExtName = "zip";
+            this.resourceVersionManifestReverse = new Map();
             this.zipMap = new Map();
             this.assetMap = new Map();
             this.loadImageCount = 0;
@@ -492,18 +512,35 @@
             this.manifest = AssetManifest.Instance;
             ZipManager.enable = true;
             this.InitCode();
+            this.InitResourceVersion();
         }
         InitCode() {
             ZipLoader.InitCode();
+            ZipLoaderManager.InitCode();
+        }
+        InitResourceVersion() {
+            this.resourceVersionManifestReverse.clear();
+            let manifest = Laya.ResourceVersion.manifest;
+            for (let path in manifest) {
+                let pathVer = manifest[path];
+                this.resourceVersionManifestReverse.set(pathVer, path);
+            }
         }
         HasZip(zipPath) {
             return this.zipMap.has(zipPath);
         }
-        HasAsset(assetPath) {
+        HasAsset(assetUrl) {
+            let assetPath = this.AssetUrlToPath(assetUrl);
             return this.assetMap.has(assetPath);
         }
         AssetUrlToPath(url) {
-            return url.replace(Laya.URL.basePath, "");
+            let verPath = url.replace(Laya.URL.basePath, "");
+            if (this.resourceVersionManifestReverse.has(verPath)) {
+                return this.resourceVersionManifestReverse.get(verPath);
+            }
+            else {
+                return verPath;
+            }
         }
         AssetUrlToName(url) {
             let assetPath = this.AssetUrlToPath(url);
@@ -738,7 +775,7 @@
         }
         onError(message) {
             DebugResources.onLoadError(this.url);
-            this.onError(message);
+            this.src_onError(message);
         }
         src_endLoad(content = null) {
         }
@@ -1238,6 +1275,10 @@
                 if (item) {
                     continue;
                 }
+                if (!manifest.HasAssetByPath(assetPath)) {
+                    console.warn("Zip 文件清单中不存在资源", assetPath);
+                    continue;
+                }
                 let dependencieAssetPathList = manifest.GetAssetDependenciePathListByAssetPath(assetPath);
                 for (let dependencieAssetPath of dependencieAssetPathList) {
                     if (tmpMap.has(dependencieAssetPath)) {
@@ -1258,7 +1299,9 @@
             this.preloadZip = new PreloadZipList(zipPathList, assetPathList);
             this.preloadAsset = new PreloadAssetList(assetPathList);
             await this.preloadZip.StartAsync();
-            await this.preloadAsset.StartAsync();
+            if (this.preloadAsset) {
+                await this.preloadAsset.StartAsync();
+            }
         }
     }
     window['PrefabManager'] = PrefabManager;

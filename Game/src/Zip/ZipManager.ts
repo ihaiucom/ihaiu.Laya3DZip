@@ -4,6 +4,7 @@ import JsZipAsync from "./JsZipAsync";
 import { EnumZipAssetDataType } from "./ZipEnum";
 import DebugResources from "../DebugResources/DebugResources";
 import AsyncUtil from "./AsyncUtil";
+import ZipLoaderManager from "./ZipLoaderManager";
 
 export default class ZipManager
 {
@@ -46,13 +47,28 @@ export default class ZipManager
         this.manifest = AssetManifest.Instance;
         ZipManager.enable = true;
         this.InitCode();
+        this.InitResourceVersion();
     }
+
 
     private InitCode()
     {
         ZipLoader.InitCode();
+        ZipLoaderManager.InitCode();
     }
 
+    resourceVersionManifestReverse:Map<string, string> = new Map<string, string>();
+    
+    private InitResourceVersion()
+    {
+        this.resourceVersionManifestReverse.clear();
+        let manifest = Laya.ResourceVersion.manifest;
+        for(let path in manifest)
+        {
+            let pathVer = manifest[path];
+            this.resourceVersionManifestReverse.set(pathVer, path);
+        }
+    }
 
 
     /** Zip 资源 */
@@ -65,15 +81,24 @@ export default class ZipManager
         return this.zipMap.has(zipPath);
     }
     
-    HasAsset(assetPath:string)
+    HasAsset(assetUrl:string)
     {
+        let assetPath = this.AssetUrlToPath(assetUrl);
         return this.assetMap.has(assetPath);
     }
 
     /** 资源Url 转 路径 */
     AssetUrlToPath(url:string): string
     {
-        return url.replace(Laya.URL.basePath, "");
+        let verPath = url.replace(Laya.URL.basePath, "");
+        if(this.resourceVersionManifestReverse.has(verPath))
+        {
+            return this.resourceVersionManifestReverse.get(verPath);
+        }
+        else
+        {
+            return verPath;
+        }
     }
     /** 资源Url 转 资源名称 */
     AssetUrlToName(url:string): string

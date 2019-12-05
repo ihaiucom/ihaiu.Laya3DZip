@@ -27,7 +27,9 @@ gulp.task("compile", prevTasks, function () {
 	}
 
 	return rollup.rollup({
-		input: workSpaceDir + '/src/GameMain.ts',
+		// input: workSpaceDir + '/src/_test/TestMain.ts',
+		// input: workSpaceDir + '/src/GameMain.ts',
+		input: workSpaceDir + '/src/LibMain.ts',
 		treeshake: true,//建议忽略
 		plugins: [
 			typescript({

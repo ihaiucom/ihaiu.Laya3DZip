@@ -64,5 +64,19 @@
     "forceCompile": false,
     "onlyIndexJS": true,
     "projectType": "ts",
-    "pubTime": 1574417015487
+    "pubTime": 1575541701877,
+    "uesEnginePlugin": false,
+    "wxOptimize": {
+        "useOptimizeOpen": false,
+        "preloadRes": false,
+        "preloadResRootDomain": "",
+        "preloadResList": [
+            {
+                "path": "wxfile://usr/",
+                "url": ""
+            }
+        ],
+        "preloadSubpack": false,
+        "preloadSubpackList": []
+    }
 }

@@ -219,6 +219,13 @@ export default class ZipManager
         let zipPath = this.manifest.GetAssetZipPath(assetName);
         let type = this.manifest.GetEnumZipAssetDataType(assetName);
         let zip = await this.GetZipAsync(zipPath);
+        
+        if(!zip)
+        {
+            console.log("没有Zip", zipPath, assetPath);
+            return null;
+        }
+        
         let data = await JsZipAsync.readAsync(zip, assetName, type);
         switch(type)
         {

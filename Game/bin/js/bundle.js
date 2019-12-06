@@ -395,6 +395,11 @@
         static async loadPathAsync(path, type) {
             return new Promise((resolve) => {
                 Laya.loader.load(path, Laya.Handler.create(null, (res) => {
+                    if (ZipManager.Instance.zipMap.has(path)) {
+                        let zip = ZipManager.Instance.zipMap.get(path);
+                        resolve(zip);
+                        return;
+                    }
                     JSZip.loadAsync(res).then((zip) => {
                         resolve(zip);
                     }).catch((error) => {
@@ -464,13 +469,90 @@
     window['AsyncUtil'] = AsyncUtil;
 
     class ZipLoaderManager {
+        constructor() {
+            this._loaderCount = 0;
+        }
         static InitCode() {
             new ZipLoaderManager().InitCode();
         }
         InitCode() {
             var LoaderManager = Laya.LoaderManager;
-            LoaderManager.prototype.src_doLoad = LoaderManager.prototype._doLoad;
-            LoaderManager.prototype._doLoad = this._doLoad;
+            LoaderManager.prototype.src_load = LoaderManager.prototype.load;
+            LoaderManager.prototype.load = this.load;
+            LoaderManager.prototype.__loadWaitZipAsync = this.__loadWaitZipAsync;
+            LoaderManager.prototype.src_createLoad = LoaderManager.prototype._createLoad;
+            LoaderManager.prototype._createLoad = this._createLoad;
+            LoaderManager.prototype.___createLoadWaitZipAsync = this.___createLoadWaitZipAsync;
+        }
+        src_createLoad(url, complete = null, progress = null, type = null, constructParams = null, propertyParams = null, priority = 1, cache = true, ignoreCache = false) {
+            return this;
+        }
+        _createLoad(url, complete = null, progress = null, type = null, constructParams = null, propertyParams = null, priority = 1, cache = true, ignoreCache = false) {
+            let manifestHas = false;
+            let zipHas = false;
+            let zipPath;
+            let zipManager;
+            if (ZipManager.enable && !(url instanceof Array)) {
+                zipManager = ZipManager.Instance;
+                manifestHas = zipManager.manifest.HasAssetByPath(url);
+                if (manifestHas) {
+                    zipPath = zipManager.GetAssetZipPathByAssetUrl(url);
+                    zipHas = zipManager.HasZip(zipPath);
+                }
+            }
+            if (!manifestHas || zipHas) {
+                return this.src_createLoad(url, complete, progress, type, constructParams, propertyParams, priority, ignoreCache);
+            }
+            this.___createLoadWaitZipAsync(zipPath, url, complete, progress, type, constructParams, propertyParams, priority, ignoreCache);
+            return this;
+        }
+        async ___createLoadWaitZipAsync(zipPath, url, complete = null, progress = null, type = null, constructParams = null, propertyParams = null, priority = 1, cache = true, ignoreCache = false) {
+            let zip = await ZipManager.Instance.GetZipAsync(zipPath);
+            await AsyncUtil.MAwitFrame();
+            this._loaderCount--;
+            var myComplete = Handler.create(this, (data) => {
+                this._loaderCount++;
+                if (complete) {
+                    complete.runWith(data);
+                }
+            });
+            this.src_createLoad(url, myComplete, progress, type, constructParams, propertyParams, priority, ignoreCache);
+            return this;
+        }
+        src_load(url, complete = null, progress = null, type = null, priority = 1, cache = true, group = null, ignoreCache = false, useWorkerLoader = Laya.WorkerLoader.enable) {
+            return this;
+        }
+        load(url, complete = null, progress = null, type = null, priority = 1, cache = true, group = null, ignoreCache = false, useWorkerLoader = Laya.WorkerLoader.enable) {
+            let manifestHas = false;
+            let zipHas = false;
+            let zipPath;
+            let zipManager;
+            if (ZipManager.enable && !(url instanceof Array)) {
+                zipManager = ZipManager.Instance;
+                manifestHas = zipManager.manifest.HasAssetByPath(url);
+                if (manifestHas) {
+                    zipPath = zipManager.GetAssetZipPathByAssetUrl(url);
+                    zipHas = zipManager.HasZip(zipPath);
+                }
+            }
+            if (!manifestHas || zipHas) {
+                return this.src_load(url, complete, progress, type, priority, cache, group, ignoreCache, useWorkerLoader);
+            }
+            this.__loadWaitZipAsync(zipPath, url, complete, progress, type, priority, cache, group, ignoreCache, useWorkerLoader);
+            return this;
+        }
+        async __loadWaitZipAsync(zipPath, url, complete = null, progress = null, type = null, priority = 1, cache = true, group = null, ignoreCache = false, useWorkerLoader = Laya.WorkerLoader.enable) {
+            let zip = await ZipManager.Instance.GetZipAsync(zipPath);
+            await AsyncUtil.MAwitFrame();
+            this._loaderCount--;
+            var myComplete = Handler.create(this, (data) => {
+                this._loaderCount++;
+                if (complete) {
+                    complete.runWith(data);
+                }
+            });
+            this.src_load(url, myComplete, progress, type, priority, cache, group, ignoreCache, useWorkerLoader);
+            return this;
         }
         src_doLoad(resInfo) {
         }
@@ -532,6 +614,11 @@
         HasAsset(assetUrl) {
             let assetPath = this.AssetUrlToPath(assetUrl);
             return this.assetMap.has(assetPath);
+        }
+        GetAssetZipPathByAssetUrl(assetUrl) {
+            let assetName = this.AssetUrlToName(assetUrl);
+            let zipPath = this.manifest.GetAssetZipPath(assetName);
+            return zipPath;
         }
         AssetUrlToPath(url) {
             let verPath = url.replace(Laya.URL.basePath, "");
@@ -611,6 +698,10 @@
             let zipPath = this.manifest.GetAssetZipPath(assetName);
             let type = this.manifest.GetEnumZipAssetDataType(assetName);
             let zip = await this.GetZipAsync(zipPath);
+            if (!zip) {
+                console.log("没有Zip", zipPath, assetPath);
+                return null;
+            }
             let data = await JsZipAsync.readAsync(zip, assetName, type);
             switch (type) {
                 case EnumZipAssetDataType.string:
@@ -1259,6 +1350,7 @@
         async PreloadPrefabList(resIdList) {
             this.StopPreload();
             if (!ZipManager.enable) {
+                await this.PreloadPrefabList2(resIdList);
                 return;
             }
             let len = resIdList.length;
@@ -1299,6 +1391,17 @@
             this.preloadZip = new PreloadZipList(zipPathList, assetPathList);
             this.preloadAsset = new PreloadAssetList(assetPathList);
             await this.preloadZip.StartAsync();
+            if (this.preloadAsset) {
+                await this.preloadAsset.StartAsync();
+            }
+        }
+        async PreloadPrefabList2(resIdList) {
+            let assetPathList = [];
+            for (let resId of resIdList) {
+                let assetPath = this.ResFileNameToAssetPath(resId);
+                assetPathList.push(assetPath);
+            }
+            this.preloadAsset = new PreloadAssetList(assetPathList);
             if (this.preloadAsset) {
                 await this.preloadAsset.StartAsync();
             }

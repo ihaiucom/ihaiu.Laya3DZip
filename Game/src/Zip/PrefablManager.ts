@@ -103,6 +103,7 @@ export default class PrefabManager
         this.StopPreload();
         if(!ZipManager.enable)
         {
+            await this.PreloadPrefabList2(resIdList);
             return;
         }
 
@@ -167,6 +168,22 @@ export default class PrefabManager
             await this.preloadAsset.StartAsync();
         }
        
+    }
+
+    private async PreloadPrefabList2(resIdList:string[])
+    {
+        let assetPathList:string[] = [];
+        for(let resId of resIdList)
+        {
+            let assetPath = this.ResFileNameToAssetPath(resId);
+            assetPathList.push(assetPath);
+        }
+        this.preloadAsset = new PreloadAssetList(assetPathList);
+
+        if(this.preloadAsset)
+        {
+            await this.preloadAsset.StartAsync();
+        }
     }
 }
 

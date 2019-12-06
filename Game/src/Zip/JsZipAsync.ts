@@ -1,3 +1,5 @@
+import ZipManager from "./ZipManager";
+
 export default class JsZipAsync
 {
     
@@ -43,6 +45,13 @@ export default class JsZipAsync
             Laya.loader.load(path, 
                 Laya.Handler.create(null, (res: any) =>
                 {
+                    if(ZipManager.Instance.zipMap.has(path))
+                    {
+                        let zip = ZipManager.Instance.zipMap.get(path);
+                        resolve(zip);
+                        return;
+                    }
+
                     JSZip.loadAsync(res).then((zip:JSZip)=>
                     {
                         resolve(zip);

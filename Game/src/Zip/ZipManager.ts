@@ -76,15 +76,24 @@ export default class ZipManager
     /** 资源数据 */
     assetMap:Map<string, any> = new Map<string, any>();
 
-    HasZip(zipPath:string)
+    HasZip(zipPath:string):boolean
     {
         return this.zipMap.has(zipPath);
     }
     
-    HasAsset(assetUrl:string)
+    HasAsset(assetUrl:string):boolean
     {
         let assetPath = this.AssetUrlToPath(assetUrl);
         return this.assetMap.has(assetPath);
+    }
+
+    /** 获取资源所在Zip路径 */
+    GetAssetZipPathByAssetUrl(assetUrl:string):string
+    {
+        let assetName = this.AssetUrlToName(assetUrl);
+        let zipPath = this.manifest.GetAssetZipPath(assetName);
+        return zipPath;
+
     }
 
     /** 资源Url 转 路径 */

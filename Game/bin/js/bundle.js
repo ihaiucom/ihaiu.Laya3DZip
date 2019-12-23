@@ -309,7 +309,7 @@
         }
         _loadHttpRequestWhat(url, contentType) {
             var ext = Laya.Utils.getFileExtension(url);
-            if (ext == ZipManager.Instance.zipExtName) {
+            if (ext == ZipManager.Instance.zipExtName || !ZipManager.Instance.HasManifestAssetByUrl(url)) {
                 this.src_loadHttpRequestWhat(url, contentType);
                 return;
             }
@@ -319,7 +319,7 @@
         }
         _loadResourceFilter(type, url) {
             var ext = Laya.Utils.getFileExtension(url);
-            if (ext == ZipManager.Instance.zipExtName) {
+            if (ext == ZipManager.Instance.zipExtName || !ZipManager.Instance.HasManifestAssetByUrl(url)) {
                 this.src_loadResourceFilter(type, url);
                 return;
             }
@@ -329,7 +329,7 @@
         }
         async _loadHttpRequest(url, contentType, onLoadCaller, onLoad, onProcessCaller, onProcess, onErrorCaller, onError) {
             var ext = Laya.Utils.getFileExtension(url);
-            if (ext == "zip") {
+            if (ext == ZipManager.Instance.zipExtName) {
                 this.src_loadHttpRequest(url, contentType, onLoadCaller, onLoad, onProcessCaller, onProcess, onErrorCaller, onError);
                 return;
             }
@@ -621,6 +621,12 @@
             return zipPath;
         }
         AssetUrlToPath(url) {
+            if (window['AssetUrlCache']) {
+                var path = AssetUrlCache.GetPath(url);
+                if (path) {
+                    return path;
+                }
+            }
             let verPath = url.replace(Laya.URL.basePath, "");
             if (this.resourceVersionManifestReverse.has(verPath)) {
                 return this.resourceVersionManifestReverse.get(verPath);
@@ -658,6 +664,10 @@
                 this.zipMap.set(zipPath, zip);
             }
             return zip;
+        }
+        HasManifestAssetByUrl(url) {
+            var assetPath = this.AssetUrlToPath(url);
+            return this.manifest.HasAssetByPath(assetPath);
         }
         GetAssetData(url) {
             var assetPath = this.AssetUrlToPath(url);

@@ -60,7 +60,7 @@ export default class ZipLoader
     {
         
         var ext =  Laya.Utils.getFileExtension(url);
-        if(ext == ZipManager.Instance.zipExtName)
+        if(ext == ZipManager.Instance.zipExtName || !ZipManager.Instance.HasManifestAssetByUrl(url))
         {
             this.src_loadHttpRequestWhat(url, contentType);
             return;
@@ -76,11 +76,14 @@ export default class ZipLoader
     private _loadResourceFilter(type: string, url: string): void 
     {
         var ext =  Laya.Utils.getFileExtension(url);
-        if(ext == ZipManager.Instance.zipExtName)
+        if(ext == ZipManager.Instance.zipExtName || !ZipManager.Instance.HasManifestAssetByUrl(url))
         {
             this.src_loadResourceFilter(type, url);
             return;
         }
+
+
+
 		this._loadResource(type, url);
     }
     
@@ -93,7 +96,7 @@ export default class ZipLoader
     private async _loadHttpRequest(url, contentType, onLoadCaller:ZipLoader, onLoad:Function, onProcessCaller, onProcess, onErrorCaller, onError)
     {
         var ext =  Laya.Utils.getFileExtension(url);
-        if(ext == "zip")
+        if(ext == ZipManager.Instance.zipExtName)
         {
             this.src_loadHttpRequest(url, contentType, onLoadCaller, onLoad, onProcessCaller, onProcess, onErrorCaller, onError);
             return;

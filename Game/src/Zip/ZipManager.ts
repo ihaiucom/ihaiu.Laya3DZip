@@ -99,6 +99,14 @@ export default class ZipManager
     /** 资源Url 转 路径 */
     AssetUrlToPath(url:string): string
     {
+        if(window['AssetUrlCache'])
+        {
+            var path = AssetUrlCache.GetPath(url);
+            if(path)
+            {
+                return path;
+            }
+        }
         let verPath = url.replace(Laya.URL.basePath, "");
         if(this.resourceVersionManifestReverse.has(verPath))
         {
@@ -157,6 +165,13 @@ export default class ZipManager
             this.zipMap.set(zipPath, zip);
         }
         return zip;
+    }
+
+    /** 获取Zip是否存在该资源 */
+    HasManifestAssetByUrl(url:string)
+    {
+        var assetPath:string = this.AssetUrlToPath(url);
+        return this.manifest.HasAssetByPath(assetPath);
     }
 
     

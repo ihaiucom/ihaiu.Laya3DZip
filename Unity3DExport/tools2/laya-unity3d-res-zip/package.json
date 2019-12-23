@@ -1,0 +1,21 @@
+{
+  "name": "ihaiulayares3d",
+  "version": "1.0.3",
+  "description": "Laya Unity3D Resource Bundle Zip",
+  "main": "bin/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "zengfeng75",
+  "license": "ISC",
+  "dependencies": {
+    "@types/node": "^12.12.14",
+    "jszip": "^3.2.2"
+  },
+  "devDependencies": {
+    "@types/jszip": "^3.1.6"
+  },
+  "bin": {
+    "ihaiu-laya3d-zip": "bin/index.js"
+  }
+}

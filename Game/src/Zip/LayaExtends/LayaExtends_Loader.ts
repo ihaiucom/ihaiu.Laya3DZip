@@ -1,11 +1,13 @@
-import ZipManager from "./ZipManager";
+import ZipManager from "../ZipManager";
 
-export default class ZipLoader 
+
+
+export default class LayaExtends_Loader 
 {
     static UseAsync:boolean = true;
     static InitCode()
     {
-        new ZipLoader().InitCode();
+        new LayaExtends_Loader().InitCode();
     }
     
     private InitCode()
@@ -22,7 +24,31 @@ export default class ZipLoader
 
         Loader.prototype.src_loadHtmlImage =  Loader.prototype._loadHtmlImage;
         Loader.prototype._loadHtmlImage = this._loadHtmlImage;
+
+        
+
+        Loader.src_clearRes =  Loader.clearRes;
+        Loader.clearRes = LayaExtends_Loader.clearRes;
     }
+
+
+    
+    /**
+     * 清理指定资源地址的缓存。 
+     * @param url 资源地址。
+     */
+    static clearRes(url: string): void 
+    {
+        (<any>Loader).src_clearRes(url);
+
+        if(ZipManager.enable)
+        {
+            ZipManager.Instance.OnClearResouceAsset(url);
+        }
+    }
+
+
+
 
     
 	/**@private */
@@ -88,12 +114,12 @@ export default class ZipLoader
     }
     
     
-    private src_loadHttpRequest(url, contentType, onLoadCaller:ZipLoader, onLoad:Function, onProcessCaller, onProcess, onErrorCaller, onError)
+    private src_loadHttpRequest(url, contentType, onLoadCaller:LayaExtends_Loader, onLoad:Function, onProcessCaller, onProcess, onErrorCaller, onError)
     {
 
     }
 
-    private async _loadHttpRequest(url, contentType, onLoadCaller:ZipLoader, onLoad:Function, onProcessCaller, onProcess, onErrorCaller, onError)
+    private async _loadHttpRequest(url, contentType, onLoadCaller:LayaExtends_Loader, onLoad:Function, onProcessCaller, onProcess, onErrorCaller, onError)
     {
         var ext =  Laya.Utils.getFileExtension(url);
         if(ext == ZipManager.Instance.zipExtName)
@@ -103,7 +129,7 @@ export default class ZipLoader
         }
 
         var data:any;
-        if(ZipLoader.UseAsync)
+        if(LayaExtends_Loader.UseAsync)
         {
             data =  await ZipManager.Instance.GetAssetDataAsync(url);
         }
@@ -137,7 +163,7 @@ export default class ZipLoader
     {
         
         var data:any;
-        if(ZipLoader.UseAsync)
+        if(LayaExtends_Loader.UseAsync)
         {
             data =  await ZipManager.Instance.GetAssetDataAsync(url);
         }

@@ -5,7 +5,7 @@ import R from "./R";
 import DebugResources from "./DebugResources/DebugResources";
 import PrefabManager from "./Zip/PrefablManager";
 import AsyncUtil from "./Zip/AsyncUtil";
-import ZipLoader from "./Zip/ZipLoader";
+import LayaExtends_Loader from "./Zip/LayaExtends/LayaExtends_Loader";
 export default class TestZip
 {
     scene: Laya.Scene3D;
@@ -58,81 +58,8 @@ export default class TestZip
     }
 
     list = [
-        // "Scene_PVE_001_001",
-        "Hero_0001_LongQi_Skin1",
-        "Hero_1002_yamamototakeshi_Skin1",
-        "Effect_1001_Kyoya_Skin1__ATTACK0",
-        "Effect_1001_Kyoya_Skin1__ATTACK1",
-        "Effect_1001_Kyoya_Skin1__ATTACK2",
-        "Effect_1001_Kyoya_Skin1__ATTACK3",
-        "Effect_1001_Kyoya_Skin1__EFFECT1_03",
-        "Effect_1001_Kyoya_Skin1__EFFECT1_03_w",
-        "Effect_1001_Kyoya_Skin1__EFFECT1_04",
-        "Effect_1001_Kyoya_Skin1__EFFECT1_05",
-        "Effect_1001_Kyoya_Skin1__EFFECT1_06",
-        "Effect_1001_Kyoya_Skin1__EFFECT1_07",
-        "Effect_1001_Kyoya_Skin1__EFFECT2_02",
-        "Effect_1001_Kyoya_Skin1__EFFECT2_03",
-        "Effect_1001_Kyoya_Skin1__EFFECT3_01",
-        "Effect_1001_Kyoya_Skin1__EFFECT3_01_w",
-        "Effect_1001_Kyoya_Skin1__EFFECT3_02",
-        "Effect_1001_Kyoya_Skin1__EFFECT3_02_w",
-        "Effect_1001_Kyoya_Skin1__EFFECT3_03",
-        "Effect_1001_Kyoya_Skin1__EFFECT3_03_w",
-        "Effect_1001_Kyoya_Skin1__EFFECT3_04",
-        "Effect_1001_Kyoya_Skin1__EFFECT3_04_w",
-        "Effect_1001_Kyoya_Skin1__EFFECT3_05",
-        "Effect_1001_Kyoya_Skin1__EFFECT3_05_w",
-        "Effect_1001_Kyoya_Skin1__EFFECT4_10",
-        "Effect_1001_Kyoya_Skin1__EFFECT4_02",
-        "Effect_1001_Kyoya_Skin1__EFFECT4_02_w",
-        "Effect_1001_Kyoya_Skin1__EFFECT4_03",
-        "Effect_1001_Kyoya_Skin1__EFFECT4_03_w",
-        "Effect_1001_Kyoya_Skin1__EFFECT4_04",
-        "Effect_1001_Kyoya_Skin1__EFFECT4_04_w",
-        "Effect_1001_Kyoya_Skin1__EFFECT4_05",
-        "Effect_1001_Kyoya_Skin1__EFFECT4_05_w",
-        "Effect_1001_Kyoya_Skin1__EFFECT4_06",
-        "Effect_1001_Kyoya_Skin1__EFFECT4_06_w",
-        "Effect_1001_Kyoya_Skin1__EFFECT4_07",
-        "Effect_1001_Kyoya_Skin1__EFFECT4_07_01",
-        "Effect_1001_Kyoya_Skin1__EFFECT4_07_w",
-        "Effect_1001_Kyoya_Skin1__EFFECT4_08",
-        "Effect_1001_Kyoya_Skin1__EFFECT4_09",
-        "Effect_1001_Kyoya_Skin1__RUN_ATTACK0",
-        "Effect_1001_Kyoya_Skin1__JUMP_ATTACK0",
-        "Effect_1002_yamamototakeshi_Skin1__ATTACK0",
-        "Effect_1002_yamamototakeshi_Skin1__ATTACK1",
-        "Effect_1002_yamamototakeshi_Skin1__ATTACK2",
-        "Effect_1002_yamamototakeshi_Skin1__ATTACK3",
-        "Effect_1002_yamamototakeshi_Skin1__JUMP_ATTACK0",
-        "Effect_1002_yamamototakeshi_Skin1__JUMP_ATTACK0_01",
-        "Effect_1002_yamamototakeshi_Skin1_RUN_ATTACK0",
-        "Effect_1002_yamamototakeshi_Skin1_RUN_ATTACK0_01",
-        "Effect_1002_yamamototakeshi_Skin1__EFFECT1",
-        "Effect_1002_yamamototakeshi_Skin1__EFFECT1_02",
-        "Effect_1002_yamamototakeshi_Skin1__EFFECT1_01",
-        "Effect_1002_yamamototakeshi_Skin1__EFFECT2",
-        "Effect_1002_yamamototakeshi_Skin1__EFFECT2_01",
-        "Effect_1002_yamamototakeshi_Skin1__EFFECT4_03",
-        "Effect_1002_yamamototakeshi_Skin1__EFFECT4_04",
-        "Effect_1002_yamamototakeshi_Skin1__EFFECT5",
-        "Effect_1002_yamamototakeshi_Skin1__EFFECT5_01",
-        "Effect_1002_yamamototakeshi_Skin1__EFFECT5_02",
-        "Monster_2001_badstudent",
-        "Monster_5001_fathoody_Skin1",
-        "Monster_5001_octopus_Skin1",
-        "Effect_5001_Fathoody__warning01_01",
-        "Effect_5001_Fathoody__skill01_02",
-        "Effect_5001_Fathoody__warning02_01",
-        "Effect_5001_Fathoody__attack02_01",
-        "Effect_5001_Fathoody__attack01_01",
-        "Effect_000_BehitCommon__Behit",
-        "Effect_Text_Forward",
-        "Effect_Text_Arrow",
-        "Effect_000_Circle__Other",
-        "Effect_000_Circle__Self",
-        "Effect_13001_fade"
+        
+			"Scene_PVE_001_003",
     ];
 
     
@@ -140,7 +67,7 @@ export default class TestZip
     {
         var beginTime = new Date().getTime();
         await ZipManager.Instance.InitAsync(R.res3dzip_manifest, R.res3d, R.res3dzip);
-        ZipLoader.UseAsync = false;
+        // ZipLoader.UseAsync = false;
         var useTime = new Date().getTime() - beginTime;
         this.textTime.text += "manifest:" + useTime + "ms\n";
 
@@ -198,7 +125,7 @@ export default class TestZip
         var list = this.list;
         for(var resId of list)
         {
-            var path = `res/res3d/Conventional/${resId}.lh`;
+            var path = `res3d/Conventional/${resId}.lh`;
             pathList.push(path);
         }
 
@@ -272,7 +199,8 @@ export default class TestZip
                 }
 
                 this.prefabList.push(res);
-                this.scene.addChild(res);
+                // this.scene.addChild(res);
+                this.onLoadMap(res);
                 // setTimeout(()=>{
                 //     res.removeSelf();
                 // }, 100)
@@ -282,6 +210,46 @@ export default class TestZip
             });
             
         this.textPath.text = "加载完成所有预设";
+    }
+
+    
+    onLoadMap(sceneRoot:Laya.Sprite3D)
+    {
+        window['sceneRoot'] = sceneRoot;
+        let mapNode: Laya.Sprite3D = <Laya.Sprite3D> sceneRoot.getChildByName("Map");
+        let mapPositionNode: Laya.Sprite3D = <Laya.Sprite3D> mapNode.getChildByName("Position");
+        let cameraNode: Laya.Sprite3D = <Laya.Sprite3D> sceneRoot.getChildByName("CameraCtrl");
+        let directionLight: Laya.DirectionLight = <Laya.DirectionLight> sceneRoot.getChildByName("Directional Light");
+        let sortLayer: Laya.Sprite3D = <Laya.Sprite3D> sceneRoot.getChildByName("UnitLayer");
+        var farLayerNode = <Laya.Sprite3D> mapPositionNode.getChildByName("FarLayer");
+        var mediumLayerNode = <Laya.Sprite3D> mapPositionNode.getChildByName("MediumLayer");
+
+
+        mapPositionNode._children[0]._children[0].meshFilter.sharedMesh = Laya.PrimitiveMesh.createPlane(10, 10, 1, 1);
+        
+        let box = new Laya.MeshSprite3D(Laya.PrimitiveMesh.createBox(1, 1, 1));
+        box.meshRenderer.sharedMaterial =  mapPositionNode._children[0]._children[0].meshRenderer.sharedMaterial;
+        this.scene.addChild(box);
+       
+
+        // this.initLayerCopy();
+        this.scene.addChild(sceneRoot);
+
+        mapNode.transform.localRotationEulerX = 20;
+        mapNode.transform.localRotationEulerY = 180;
+
+        mapPositionNode.transform.localPositionZ = 100;
+        
+        window['mapNode'] = mapNode;
+        window['mapPositionNode'] = mapPositionNode;
+        console.log(mapPositionNode);
+
+        
+        if(cameraNode)
+            cameraNode.removeSelf();
+
+        if(directionLight)
+            directionLight.removeSelf();
     }
     
     async testLoadHero1()

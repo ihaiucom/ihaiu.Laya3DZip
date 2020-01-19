@@ -35,7 +35,7 @@ export default class JsZipAsync
                     }
                 })
             }), 
-            null, type);
+            null, type, undefined, false);
     }
 
     static async loadPathAsync(path: string, type:string): Promise<JSZip>
@@ -60,7 +60,7 @@ export default class JsZipAsync
                         resolve();
                     })
                 }), 
-                null, type);
+                null, type, undefined, false);
 		});
     }
 

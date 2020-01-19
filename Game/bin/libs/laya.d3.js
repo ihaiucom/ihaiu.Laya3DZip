@@ -30980,12 +30980,41 @@
 	        Laya3D._endLoad(loader, item, subUrls);
 	    }
 	    static _loadMesh(loader) {
+			
+			console.log("_loadMesh", loader.url);
 	        loader.on(Laya.Event.LOADED, null, Laya3D._onMeshLmLoaded, [loader]);
 	        loader.load(loader.url, Laya.Loader.BUFFER, false, null, true);
-	    }
+		}
 	    static _onMeshLmLoaded(loader, lmData) {
-	        loader._cache = loader._createCache;
-	        var mesh = Mesh._parse(lmData, loader._propertyParams, loader._constructParams);
+			// loader._createCache = true;
+			loader._cache = loader._createCache;
+			console.log("_onMeshLmLoaded", loader.url);
+			
+			var mesh = Mesh._parse(lmData, loader._propertyParams, loader._constructParams);
+			
+			if(!window['__zfMeshList'])
+			{
+				window.__zfMeshList = [];
+			}
+			window.__zfMeshList.push(mesh);
+
+			
+			if(!window['__zfMeshMap'])
+			{
+				window.__zfMeshMap = {};
+			}
+
+			if(window.__zfMeshMap[loader.url])
+			{
+				console.error("有重复加载资源Mesh", loader.url);
+			}
+
+			if(!window.__zfMeshMap[loader.url])
+			{
+				window.__zfMeshMap[loader.url] = [];
+			}
+			window.__zfMeshMap[loader.url].push(mesh);
+
 	        Laya3D._endLoad(loader, mesh);
 	    }
 	    static _loadMaterial(loader) {
@@ -31080,9 +31109,35 @@
 	        }
 	        loader.on(Laya.Event.LOADED, null, function (image) {
 	            loader._cache = loader._createCache;
-	            var tex = Laya.Texture2D._parse(image, loader._propertyParams, loader._constructParams);
+				var tex = Laya.Texture2D._parse(image, loader._propertyParams, loader._constructParams);
+			
+				if(!window['__zfTexture2DList'])
+				{
+					window.__zfTexture2DList = [];
+				}
+				window.__zfTexture2DList.push(tex);
+
+				
+				if(!window['__zfTexture2DMap'])
+				{
+					window.__zfTexture2DMap = {};
+				}
+
+				var url = loader.url;
+				if(window.__zfTexture2DMap[url])
+				{
+					console.error("有重复加载资源Texture2D", url);
+				}
+
+				if(!window.__zfTexture2DMap[url])
+				{
+					window.__zfTexture2DMap[url] = [];
+				}
+				window.__zfTexture2DMap[url].push(tex);
+
 	            Laya3D._endLoad(loader, tex);
-	        });
+			});
+			console.log("_loadTexture2D", loader.url);
 	        loader.load(loader.url, type, false, null, true);
 	    }
 	    static _loadTextureCube(loader) {

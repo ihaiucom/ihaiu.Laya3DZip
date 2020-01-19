@@ -282,9 +282,9 @@
     }
     window['AssetManifest'] = AssetManifest;
 
-    class ZipLoader {
+    class LayaExtends_Loader {
         static InitCode() {
-            new ZipLoader().InitCode();
+            new LayaExtends_Loader().InitCode();
         }
         InitCode() {
             var Loader = Laya.Loader;
@@ -296,6 +296,14 @@
             Loader.prototype._loadHttpRequest = this._loadHttpRequest;
             Loader.prototype.src_loadHtmlImage = Loader.prototype._loadHtmlImage;
             Loader.prototype._loadHtmlImage = this._loadHtmlImage;
+            Loader.src_clearRes = Loader.clearRes;
+            Loader.clearRes = LayaExtends_Loader.clearRes;
+        }
+        static clearRes(url) {
+            Loader.src_clearRes(url);
+            if (ZipManager.enable) {
+                ZipManager.Instance.OnClearResouceAsset(url);
+            }
         }
         onProgress(value) {
         }
@@ -334,7 +342,7 @@
                 return;
             }
             var data;
-            if (ZipLoader.UseAsync) {
+            if (LayaExtends_Loader.UseAsync) {
                 data = await ZipManager.Instance.GetAssetDataAsync(url);
             }
             else {
@@ -354,7 +362,7 @@
         }
         async _loadHtmlImage(url, onLoadCaller, onLoad, onErrorCaller, onError) {
             var data;
-            if (ZipLoader.UseAsync) {
+            if (LayaExtends_Loader.UseAsync) {
                 data = await ZipManager.Instance.GetAssetDataAsync(url);
             }
             else {
@@ -368,7 +376,7 @@
             }
         }
     }
-    ZipLoader.UseAsync = true;
+    LayaExtends_Loader.UseAsync = true;
 
     class JsZipAsync {
         static loadPath(path, type, callbacker, onComponent) {
@@ -390,7 +398,7 @@
                         onComponent.call(callbacker, null);
                     }
                 });
-            }), null, type);
+            }), null, type, undefined, false);
         }
         static async loadPathAsync(path, type) {
             return new Promise((resolve) => {
@@ -406,7 +414,7 @@
                         console.error(error);
                         resolve();
                     });
-                }), null, type);
+                }), null, type, undefined, false);
             });
         }
         static async readAsync(zip, path, type) {
@@ -468,12 +476,12 @@
     }
     window['AsyncUtil'] = AsyncUtil;
 
-    class ZipLoaderManager {
+    class LayaExtends_LoaderManager {
         constructor() {
             this._loaderCount = 0;
         }
         static InitCode() {
-            new ZipLoaderManager().InitCode();
+            new LayaExtends_LoaderManager().InitCode();
         }
         InitCode() {
             var LoaderManager = Laya.LoaderManager;
@@ -501,9 +509,9 @@
                 }
             }
             if (!manifestHas || zipHas) {
-                return this.src_createLoad(url, complete, progress, type, constructParams, propertyParams, priority, ignoreCache);
+                return this.src_createLoad(url, complete, progress, type, constructParams, propertyParams, priority, cache, ignoreCache);
             }
-            this.___createLoadWaitZipAsync(zipPath, url, complete, progress, type, constructParams, propertyParams, priority, ignoreCache);
+            this.___createLoadWaitZipAsync(zipPath, url, complete, progress, type, constructParams, propertyParams, priority, cache, ignoreCache);
             return this;
         }
         async ___createLoadWaitZipAsync(zipPath, url, complete = null, progress = null, type = null, constructParams = null, propertyParams = null, priority = 1, cache = true, ignoreCache = false) {
@@ -516,7 +524,7 @@
                     complete.runWith(data);
                 }
             });
-            this.src_createLoad(url, myComplete, progress, type, constructParams, propertyParams, priority, ignoreCache);
+            this.src_createLoad(url, myComplete, progress, type, constructParams, propertyParams, priority, cache, ignoreCache);
             return this;
         }
         src_load(url, complete = null, progress = null, type = null, priority = 1, cache = true, group = null, ignoreCache = false, useWorkerLoader = Laya.WorkerLoader.enable) {
@@ -554,13 +562,26 @@
             this.src_load(url, myComplete, progress, type, priority, cache, group, ignoreCache, useWorkerLoader);
             return this;
         }
-        src_doLoad(resInfo) {
+    }
+
+    class LayaExtends_Resouces {
+        static InitCode() {
+            new LayaExtends_Resouces().InitCode();
         }
-        _doLoad(resInfo) {
+        InitCode() {
+            var Resource = Laya.Resource;
+            Resource.prototype.src_destroy = Resource.prototype.destroy;
+            Resource.prototype.destroy = this.destroy;
+        }
+        src_destroy() {
+        }
+        destroy() {
+            this.src_destroy();
             if (ZipManager.enable) {
-                var has = ZipManager.Instance.manifest.HasAssetByPath(resInfo.url);
+                if (this._url) {
+                    ZipManager.Instance.OnClearResouceAsset(this._url);
+                }
             }
-            this.src_doLoad(resInfo);
         }
     }
 
@@ -568,9 +589,12 @@
         constructor() {
             this.zipExt = ".zip";
             this.zipExtName = "zip";
+            this.srcRootPath = "res3d/Conventional/";
             this.resourceVersionManifestReverse = new Map();
             this.zipMap = new Map();
             this.assetMap = new Map();
+            this.assetReferenceMap = new Map();
+            this.zipUseAssetMap = new Map();
             this.loadImageCount = 0;
             this.imageCount = 0;
         }
@@ -592,13 +616,19 @@
             }
             await AssetManifest.InitAsync(manifestPath, srcRootPath, zipRootPath, zipExt);
             this.manifest = AssetManifest.Instance;
+            this.srcRootPath = srcRootPath;
             ZipManager.enable = true;
             this.InitCode();
             this.InitResourceVersion();
         }
         InitCode() {
-            ZipLoader.InitCode();
-            ZipLoaderManager.InitCode();
+            if (ZipManager.isInitCode) {
+                return;
+            }
+            ZipManager.isInitCode = true;
+            LayaExtends_Loader.InitCode();
+            LayaExtends_LoaderManager.InitCode();
+            LayaExtends_Resouces.InitCode();
         }
         InitResourceVersion() {
             this.resourceVersionManifestReverse.clear();
@@ -607,6 +637,84 @@
                 let pathVer = manifest[path];
                 this.resourceVersionManifestReverse.set(pathVer, path);
             }
+        }
+        GetZipUseAssetMap(zipPath, isCreate) {
+            if (this.zipUseAssetMap.has(zipPath)) {
+                return this.zipUseAssetMap.get(zipPath);
+            }
+            else {
+                if (isCreate) {
+                    var m = new Map();
+                    this.zipUseAssetMap.set(zipPath, m);
+                    return m;
+                }
+                return null;
+            }
+        }
+        AddZipUseAsset(zipPath, assetPath) {
+            var m = this.GetZipUseAssetMap(zipPath, true);
+            var num = m.getValueOrDefault(zipPath) + 1;
+            m.set(assetPath, num);
+        }
+        RemoveZipUseAsset(zipPath, assetPath) {
+            var m = this.GetZipUseAssetMap(zipPath, true);
+            var num = m.getValueOrDefault(zipPath) - 1;
+            if (num <= 0) {
+                m.delete(assetPath);
+            }
+            else {
+                m.set(assetPath, num);
+            }
+        }
+        AddAssetReference(assetPath, count = 1) {
+            if (this.assetReferenceMap.has(assetPath)) {
+                this.assetReferenceMap.set(assetPath, this.assetReferenceMap.get(assetPath) + count);
+            }
+            else {
+                this.assetReferenceMap.set(assetPath, count);
+            }
+        }
+        RemoveAssetReference(assetPath, count = 1) {
+            if (this.assetReferenceMap.has(assetPath)) {
+                this.assetReferenceMap.set(assetPath, this.assetReferenceMap.get(assetPath) - count);
+            }
+        }
+        GetAssetReference(assetPath) {
+            if (this.assetReferenceMap.has(assetPath)) {
+                return this.assetReferenceMap.get(assetPath);
+            }
+            return 0;
+        }
+        OnClearResouceAsset(assetUrl) {
+            let assetPath = this.AssetUrlToPath(assetUrl);
+            this.RemoveAssetReference(assetPath);
+        }
+        DestroyUnusedAssets() {
+            this.assetReferenceMap.forEach((referenceCount, assetPath) => {
+                if (referenceCount <= 0 && this.assetMap.has(assetPath)) {
+                    var assetData = this.assetMap.get(assetPath);
+                    this.assetMap.delete(assetPath);
+                    let assetName = this.manifest.GetAssetNameByPath(assetPath);
+                    let zipPath = this.manifest.GetAssetZipPath(assetName);
+                    this.RemoveZipUseAsset(zipPath, assetPath);
+                }
+            });
+            this.DestroyUnusedZip();
+        }
+        DestroyUnusedZip() {
+            this.zipUseAssetMap.forEach((infoMap, zipPath) => {
+                if (infoMap.size == 0) {
+                    if (this.zipMap.has(zipPath)) {
+                        var zip = this.zipMap.get(zipPath);
+                        this.zipMap.delete(zipPath);
+                    }
+                }
+            });
+        }
+        PrintAssetReferenceMap() {
+            this.assetReferenceMap.forEach((count, assetName) => {
+                console.log(assetName, count);
+            });
         }
         HasZip(zipPath) {
             return this.zipMap.has(zipPath);
@@ -681,6 +789,7 @@
             }
             if (this.assetMap.has(assetPath)) {
                 data = this.assetMap.get(assetPath);
+                this.AddAssetReference(assetPath);
             }
             return data;
         }
@@ -696,9 +805,15 @@
             }
             if (this.assetMap.has(assetPath)) {
                 data = this.assetMap.get(assetPath);
+                this.AddAssetReference(assetPath);
             }
             else {
                 data = await this.LoadAssetData(assetPath);
+                var assetReferenceCount = this.GetAssetReference(assetPath);
+                if (assetReferenceCount > 0) {
+                    console.error("ZipManager.GetAssetDataAsync 已经存在创建的资源了", assetPath, assetReferenceCount);
+                }
+                this.AddAssetReference(assetPath);
                 this.assetMap.set(assetPath, data);
             }
             return data;
@@ -722,6 +837,7 @@
                     this.imageCount++;
                     break;
             }
+            this.AddZipUseAsset(zipPath, assetPath);
             return data;
         }
         async LoadAssetZipListAsync(assetPathList, callbacker, onProgerss) {
@@ -842,6 +958,10 @@
                                         break;
                                 }
                             }
+                            var assetReferenceCount = this.GetAssetReference(assetPath);
+                            if (assetReferenceCount > 0) {
+                                console.error("ZipManager.ReadAllZipAsync asset 已经存在创建的资源了", assetPath, assetReferenceCount);
+                            }
                             this.assetMap.set(assetPath, data);
                             progerssFun(assetNameLoadedCount, assetNameTotal, zipPath);
                             subProgerssFun(j, jLen, assetName);
@@ -855,6 +975,7 @@
         }
     }
     ZipManager.enable = false;
+    ZipManager.isInitCode = false;
     window['ZipManager'] = ZipManager;
 
     class DebugLoader {
@@ -1422,7 +1543,7 @@
     window['AssetManifest'] = AssetManifest;
     window['AsyncUtil'] = AsyncUtil;
     window['JsZipAsync'] = JsZipAsync;
-    window['ZipLoader'] = ZipLoader;
+    window['ZipLoader'] = LayaExtends_Loader;
     window['ZipManager'] = ZipManager;
     window['PrefabManager'] = PrefabManager;
     window['DebugResources'] = DebugResources;

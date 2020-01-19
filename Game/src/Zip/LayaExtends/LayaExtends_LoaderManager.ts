@@ -1,10 +1,10 @@
-import ZipManager from "./ZipManager";
-import AsyncUtil from "./AsyncUtil";
+import ZipManager from "../ZipManager";
+import AsyncUtil from "../AsyncUtil";
 
-export default class ZipLoaderManager 
+export default class LayaExtends_LoaderManager 
 {
     static InitCode() {
-        new ZipLoaderManager().InitCode();
+        new LayaExtends_LoaderManager().InitCode();
     }
     InitCode() {
         var LoaderManager:any = Laya.LoaderManager;
@@ -51,10 +51,10 @@ export default class ZipLoaderManager
 
         if (!manifestHas || zipHas) 
         {
-            return this.src_createLoad(url, complete, progress, type, constructParams, propertyParams, priority, ignoreCache);
+            return this.src_createLoad(url, complete, progress, type, constructParams, propertyParams, priority, cache, ignoreCache);
         }
 
-        this.___createLoadWaitZipAsync(zipPath, url, complete, progress, type, constructParams, propertyParams, priority, ignoreCache);
+        this.___createLoadWaitZipAsync(zipPath, url, complete, progress, type, constructParams, propertyParams, priority,cache, ignoreCache);
 
         return <any>this;
     }
@@ -75,7 +75,7 @@ export default class ZipLoaderManager
                 complete.runWith(data);
             }
         })
-        this.src_createLoad(url, myComplete, progress, type, constructParams, propertyParams, priority, ignoreCache);
+        this.src_createLoad(url, myComplete, progress, type, constructParams, propertyParams, priority,cache, ignoreCache);
         return <any>this;
     }
 
@@ -139,43 +139,15 @@ export default class ZipLoaderManager
 
 
 
-    src_doLoad(resInfo) {
-    }
-    _doLoad(resInfo) {
-        if (ZipManager.enable) {
-            var has = ZipManager.Instance.manifest.HasAssetByPath(resInfo.url);
+    // src_doLoad(resInfo) {
+    // }
+    // _doLoad(resInfo) {
+    //     if (ZipManager.enable) {
+    //         var has = ZipManager.Instance.manifest.HasAssetByPath(resInfo.url);
             
-        }
-        this.src_doLoad(resInfo);
-    }
+    //     }
+    //     this.src_doLoad(resInfo);
+    // }
 
     
-    // _doLoad(resInfo: any): void 
-    // {
-    //     this._loaderCount++;
-    //     var loader: Loader = this._loaders.length ? this._loaders.pop() : new Loader();
-    //     loader.on(Event.COMPLETE, null, onLoaded);
-    //     loader.on(Event.PROGRESS, null, function (num: number): void {
-    //         resInfo.event(Event.PROGRESS, num);
-    //     });
-    //     loader.on(Event.ERROR, null, function (msg: any): void {
-    //         onLoaded(null);
-    //     });
-
-    //     var _me: LoaderManager = this;
-    //     function onLoaded(data: any = null): void {
-    //         loader.offAll();
-    //         loader._data = null;
-    //         loader._customParse = false;
-    //         _me._loaders.push(loader);
-    //         _me._endLoad(resInfo, data instanceof Array ? [data] : data);
-    //         _me._loaderCount--;
-    //         _me._next();
-    //     }
-
-    //     loader._constructParams = resInfo.createConstructParams;
-    //     loader._propertyParams = resInfo.createPropertyParams;
-    //     loader._createCache = resInfo.createCache;
-    //     loader.load(resInfo.url, resInfo.type, resInfo.cache, resInfo.group, resInfo.ignoreCache, resInfo.useWorkerLoader);
-    // }
 }

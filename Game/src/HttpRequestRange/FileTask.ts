@@ -340,10 +340,10 @@ export default class FileTask
             return;
         }
         var url = Laya.URL.formatURL(path)
-        if(url.indexOf("Monster_2005_gongjianshou_Skin1.zip") != -1)
-        {
-            console.error(url);
-        }
+        // if(url.indexOf("Monster_2005_gongjianshou_Skin1.zip") != -1)
+        // {
+        //     console.error(url);
+        // }
         let item = this.GetItem();
         item.path = path;
         item.onCompleteHandler = onCompleteHandler;

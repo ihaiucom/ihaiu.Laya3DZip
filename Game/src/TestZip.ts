@@ -75,7 +75,7 @@ export default class TestZip
 
         
         var beginTime = new Date().getTime();
-        await PrefabManager.Instance.PreloadPrefabList(this.list)
+        await PrefabManager.Instance.PreloadPrefabListAsync(this.list)
         var useTime = new Date().getTime() - beginTime;
         this.textTime.text += "PreloadPrefabList:" + useTime + "ms\n";
 

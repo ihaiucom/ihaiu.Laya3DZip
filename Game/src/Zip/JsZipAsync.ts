@@ -1,46 +1,43 @@
 import ZipManager from "./ZipManager";
+import Handler = Laya.Handler;
+import FileTask from "../HttpRequestRange/FileTask";
 
 export default class JsZipAsync
 {
     
-    static loadPath(path: string, type:string, callbacker:any, onComponent:((zip)=>void))
-    {
-        Laya.loader.load(path, 
-            Laya.Handler.create(null, (res: any) =>
-            {
-                if(!res)
-                {
-                    
-                    console.error("没加载到资源:", path);
-                    
-                    if(onComponent)
-                    {
-                        onComponent.call(callbacker, null);
-                    }
-                    return;
-                }
-                
-                JSZip.loadAsync(res).then((zip:JSZip)=>
-                { 
-                    if(onComponent)
-                    {
-                        onComponent.call(callbacker, zip);
-                    }
-                }).catch((error)=>{
-                    console.error(error);
-                    
-                    if(onComponent)
-                    {
-                        onComponent.call(callbacker, null);
-                    }
-                })
-            }), 
-            null, type, undefined, false);
-    }
+    
 
-    static async loadPathAsync(path: string, type:string): Promise<JSZip>
+    static loadPath(path: string, type:string, callback:Handler)
     {
-        return new Promise<any>((resolve)=>
+        var isUseLaya = false;
+        if(path.indexOf("res3d/") != -1)
+        {
+            if(path.indexOf("Effect_100") != -1|| path.indexOf("Hero_100") != -1)
+            {
+                isUseLaya = true;
+            }
+        }
+        
+        if(!isUseLaya)
+        {
+            FileTask.Request(path, (res:any, url)=>{
+                if(ZipManager.Instance.zipMap.has(path))
+                    {
+                        let zip = ZipManager.Instance.zipMap.get(path);
+                        callback.runWith(zip);
+                        return;
+                    }
+    
+                    JSZip.loadAsync(res).then((zip:JSZip)=>
+                    {
+                        callback.runWith(zip);
+                    }).catch((error)=>{
+                        console.error(error, path);
+                        callback.runWith(null);
+                    })
+            });
+        }
+        else
         {
             Laya.loader.load(path, 
                 Laya.Handler.create(null, (res: any) =>
@@ -48,53 +45,75 @@ export default class JsZipAsync
                     if(ZipManager.Instance.zipMap.has(path))
                     {
                         let zip = ZipManager.Instance.zipMap.get(path);
-                        resolve(zip);
+                        callback.runWith(zip);
                         return;
                     }
-
+    
                     JSZip.loadAsync(res).then((zip:JSZip)=>
                     {
-                        resolve(zip);
+                        callback.runWith(zip);
                     }).catch((error)=>{
-                        console.error(error);
-                        resolve();
+                        console.error(error, path);
+                        callback.runWith(null);
                     })
                 }), 
-                null, type, undefined, false);
-		});
+                null, type);
+
+        }
+        
     }
 
-    
-    static async readAsync(zip:JSZip, path: string, type:string): Promise<any>
-    {
-        return new Promise<any>((resolve)=>
-        {
-            zip.file(path).async(<any>type).then((data:any)=>
-            {
-                resolve(data);
-            }).catch((error)=>{
-                console.error(error);
-                resolve();
-            });
-		});
-    }
+    // static async loadPathAsync(path: string, type:string): Promise<JSZip>
+    // {
+    //     return new Promise<any>((resolve)=>
+    //     {
+    //         Laya.loader.load(path, 
+    //             Laya.Handler.create(null, (res: any) =>
+    //             {
+    //                 if(ZipManager.Instance.zipMap.has(path))
+    //                 {
+    //                     let zip = ZipManager.Instance.zipMap.get(path);
+    //                     resolve(zip);
+    //                     return;
+    //                 }
+
+    //                 JSZip.loadAsync(res).then((zip:JSZip)=>
+    //                 {
+    //                     resolve(zip);
+    //                 }).catch((error)=>{
+    //                     console.error(error);
+    //                     resolve();
+    //                 })
+    //             }), 
+    //             null, type, undefined, false);
+	// 	});
+    // }
 
     
-    static read(zip:JSZip, path: string, type:string, callbacker:any, onComponent:((data)=>void))
+    // static async readAsync(zip:JSZip, path: string, type:string): Promise<any>
+    // {
+    //     return new Promise<any>((resolve)=>
+    //     {
+    //         zip.file(path).async(<any>type).then((data:any)=>
+    //         {
+    //             resolve(data);
+    //         }).catch((error)=>{
+    //             console.error(error);
+    //             resolve();
+    //         });
+	// 	});
+    // }
+
+    
+    static read(zip:JSZip, path: string, type:string, callback: Handler)
     {
         zip.file(path).async(<any>type).then((data:any)=>
         {
-            if(onComponent)
-            {
-                onComponent.call(callbacker, data);
-            }
-        }).catch((error)=>{
-            console.error(error);
-            
-            if(onComponent)
-            {
-                onComponent.call(callbacker, null);
-            }
+            callback.runWith(data);
+        }).catch((error)=>
+        {
+            console.error(error, path);
+            callback.runWith(null);
         });
 
     }

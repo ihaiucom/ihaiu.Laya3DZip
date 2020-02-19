@@ -341,102 +341,617 @@
                 this.src_loadHttpRequest(url, contentType, onLoadCaller, onLoad, onProcessCaller, onProcess, onErrorCaller, onError);
                 return;
             }
-            var data;
-            if (LayaExtends_Loader.UseAsync) {
-                data = await ZipManager.Instance.GetAssetDataAsync(url);
-            }
-            else {
-                data = ZipManager.Instance.GetAssetData(url);
-            }
-            if (data) {
-                if (onProcess)
-                    onProcess.call(onLoadCaller, 1);
-                onLoad.call(onLoadCaller, data);
-                return;
-            }
-            else {
-                this.src_loadHttpRequest(url, contentType, onLoadCaller, onLoad, onProcessCaller, onProcess, onErrorCaller, onError);
-            }
+            ZipManager.Instance.GetOrLoadAssetData(url, Handler.create(this, (data) => {
+                if (data) {
+                    Laya.timer.frameOnce(1, this, () => {
+                        if (onProcess)
+                            onProcess.call(onLoadCaller, 1);
+                        onLoad.call(onLoadCaller, data);
+                    });
+                    return;
+                }
+                else {
+                    this.src_loadHttpRequest(url, contentType, onLoadCaller, onLoad, onProcessCaller, onProcess, onErrorCaller, onError);
+                }
+            }));
         }
         src_loadHtmlImage(url, onLoadCaller, onLoad, onErrorCaller, onError) {
         }
         async _loadHtmlImage(url, onLoadCaller, onLoad, onErrorCaller, onError) {
-            var data;
-            if (LayaExtends_Loader.UseAsync) {
-                data = await ZipManager.Instance.GetAssetDataAsync(url);
-            }
-            else {
-                data = ZipManager.Instance.GetAssetData(url);
-            }
-            if (data) {
-                this.src_loadHtmlImage(data, onLoadCaller, onLoad, onErrorCaller, onError);
-            }
-            else {
-                this.src_loadHtmlImage(url, onLoadCaller, onLoad, onErrorCaller, onError);
-            }
+            ZipManager.Instance.GetOrLoadAssetData(url, Handler.create(this, (data) => {
+                if (data) {
+                    Laya.timer.frameOnce(1, this, () => {
+                        this.src_loadHtmlImage(data, onLoadCaller, onLoad, onErrorCaller, onError);
+                    });
+                }
+                else {
+                    this.src_loadHtmlImage(url, onLoadCaller, onLoad, onErrorCaller, onError);
+                }
+            }));
         }
     }
     LayaExtends_Loader.UseAsync = true;
 
-    class JsZipAsync {
-        static loadPath(path, type, callbacker, onComponent) {
-            Laya.loader.load(path, Laya.Handler.create(null, (res) => {
-                if (!res) {
-                    console.error("没加载到资源:", path);
-                    if (onComponent) {
-                        onComponent.call(callbacker, null);
-                    }
-                    return;
-                }
-                JSZip.loadAsync(res).then((zip) => {
-                    if (onComponent) {
-                        onComponent.call(callbacker, zip);
-                    }
-                }).catch((error) => {
-                    console.error(error);
-                    if (onComponent) {
-                        onComponent.call(callbacker, null);
-                    }
-                });
-            }), null, type, undefined, false);
+    class FileBlock {
+        constructor() {
+            this.index = 0;
+            this.begin = 0;
+            this.end = 0;
+            this.responseList = [];
+            this.progressList = [];
+            this.sendIndex = -1;
+            this._isAbort = false;
+            this._isComplete = false;
         }
-        static async loadPathAsync(path, type) {
-            return new Promise((resolve) => {
-                Laya.loader.load(path, Laya.Handler.create(null, (res) => {
+        get rangeBegin() {
+            return this.begin + this.loadedSize;
+        }
+        get loadedSize() {
+            var v = 0;
+            for (var i = 0, len = this.progressList.length; i < len; i++) {
+                v += this.progressList[i];
+            }
+            return v;
+        }
+        Reset() {
+            this.fileTask = null;
+            this.begin = 0;
+            this.end = 0;
+            this.responseList.length = 0;
+            this.progressList.length = 1;
+            this.progressList[0] = 0;
+            this.sendIndex = -1;
+            this._isAbort = false;
+            this._isComplete = false;
+        }
+        get isAbort() {
+            return this._isAbort;
+        }
+        get isComplete() {
+            return this._isComplete;
+        }
+        OnEnd(isAbort) {
+            this._isAbort = isAbort;
+            this._isComplete = this.loadedSize == this.end;
+            this.fileTask.OnBlockEnd(this);
+        }
+        MergeToBuff(buff) {
+            var offset = this.begin;
+            for (var i = 0, len = this.responseList.length; i < len; i++) {
+                var item = this.responseList[i];
+                var itemBuff = new Int8Array(item);
+                buff.set(itemBuff, offset);
+                offset += item.byteLength;
+            }
+        }
+        static PoolGetItem() {
+            var item;
+            if (this.pool.length > 0) {
+                item = this.pool.shift();
+            }
+            else {
+                item = new FileBlock();
+            }
+            item.Reset();
+            return item;
+        }
+        static PoolRecoverItem(item) {
+            if (this.pool.indexOf(item) == -1) {
+                return this.pool.push(item);
+            }
+        }
+    }
+    FileBlock.pool = [];
+
+    class HRHead {
+        constructor() {
+            this.xhr = new XMLHttpRequest();
+            this.xhr.onreadystatechange = (this.onEvent.bind(this));
+        }
+        onEvent(e) {
+            if (this.xhr.readyState == 4) {
+                if (this.xhr.status == 200) {
+                    var fileSize = this.xhr.getResponseHeader('Content-Length');
+                    console.log(fileSize);
+                    this.ResultCallbak(0, parseInt(fileSize));
+                }
+                else {
+                    console.log("HRHead 请求文件头失败", this.url);
+                    this.ResultCallbak(1, -1);
+                }
+            }
+        }
+        ResultCallbak(errorCode, fileSize) {
+            if (this.callback) {
+                if (this.callbackObj) {
+                    this.callback.call(this.callbackObj, errorCode, fileSize, this.url);
+                }
+                else {
+                    this.callback(errorCode, fileSize, this.url);
+                }
+            }
+            this.callback = null;
+            this.callbackObj = null;
+            this.xhr.abort();
+            this.url = null;
+            HRHead.RecoverItem(this);
+        }
+        Request(url, callback, callbackObj) {
+            this.url = url;
+            this.callback = callback;
+            this.callbackObj = callbackObj;
+            this.xhr.open('HEAD', url, true);
+            this.xhr.send();
+        }
+        static GetItem() {
+            if (this.pool.length > 0) {
+                return this.pool.shift();
+            }
+            else {
+                if (this.currNum < this.MaxNum) {
+                    this.currNum++;
+                    return new HRHead();
+                }
+                else {
+                    return null;
+                }
+            }
+        }
+        static RecoverItem(item) {
+            if (this.wait.length > 0) {
+                let waitItem = this.wait.shift();
+                item.Request(waitItem.url, waitItem.callback, waitItem.callbackObj);
+            }
+            else {
+                if (this.pool.indexOf(item) == -1) {
+                    this.pool.push(item);
+                }
+            }
+        }
+        static RequestSize(url, callback, callbackObj) {
+            let item = this.GetItem();
+            if (item) {
+                item.Request(url, callback, callbackObj);
+            }
+            else {
+                this.wait.push({ url: url, callback: callback, callbackObj: callbackObj });
+            }
+        }
+    }
+    HRHead.MaxNum = 2;
+    HRHead.currNum = 0;
+    HRHead.pool = [];
+    HRHead.wait = [];
+
+    class HRange {
+        constructor() {
+            this.xhr = new XMLHttpRequest();
+            this.xhr.onreadystatechange = (this.onreadystatechange.bind(this));
+            this.xhr.onprogress = (this.onprogress.bind(this));
+            this.xhr.onerror = (this.onerror.bind(this));
+            window['xhr'] = this;
+        }
+        get blockInfo() {
+            return "block_" + this.block.index + ", sendIndex=" + this.block.sendIndex;
+        }
+        onreadystatechange(e) {
+            if (!this.block) {
+                return;
+            }
+            if (this.xhr.readyState >= XMLHttpRequest.LOADING) {
+                if (this.xhr.response) {
+                    this.block.responseList[this.block.sendIndex] = this.xhr.response;
+                }
+            }
+            if (this.xhr.readyState == 4) {
+                if (this.xhr.status >= 200 && this.xhr.status < 300 || this.xhr.response) {
+                    this.OnEnd();
+                }
+                else {
+                    console.error(this.blockInfo, "HRange 请求文件失败", " readyState=" + this.xhr.readyState, " status=" + this.xhr.status, "response=", this.xhr.response, this.block.fileTask.url);
+                }
+            }
+        }
+        onprogress(e) {
+            this.block.progressList[this.block.sendIndex] = e.loaded;
+            this.block.fileTask.OnPorgess(e.loaded, e.total);
+        }
+        onabort() {
+            console.warn(this.blockInfo, "onabort");
+            this.OnEnd(true);
+        }
+        onerror(e) {
+            console.error(this.blockInfo, e, this.block.fileTask.url);
+            Laya.timer.frameOnce(10, this, this.Request, [this.block, true]);
+        }
+        OnEnd(isAbort) {
+            this.block.OnEnd(isAbort);
+            this.block = null;
+            if (!isAbort) {
+                this.xhr.abort();
+            }
+            HRange.RecoverItem(this);
+        }
+        Request(block, isError) {
+            if (isError) {
+                if (!block.responseList[block.sendIndex]) {
+                    block.progressList[block.sendIndex] = 0;
+                }
+                else {
+                    block.sendIndex++;
+                }
+            }
+            else {
+                block.sendIndex++;
+            }
+            this.block = block;
+            this.xhr.abort();
+            this.xhr.responseType = block.fileTask.responseType;
+            this.xhr.open("get", block.fileTask.url, true);
+            if (block.end <= 0) {
+                this.xhr.setRequestHeader("Range", `bytes=0- `);
+            }
+            else {
+                this.xhr.setRequestHeader("Range", `bytes=${block.rangeBegin}-${block.end}`);
+            }
+            this.xhr.setRequestHeader("content-type", "application/octet-stream");
+            this.xhr.send();
+            console.log(this.blockInfo, "HRRange.Request");
+        }
+        Abort() {
+            this.xhr.abort();
+        }
+        static GetItem() {
+            if (this.pool.length > 0) {
+                return this.pool.shift();
+            }
+            else {
+                if (this.currNum < this.MaxNum) {
+                    this.currNum++;
+                    return new HRange();
+                }
+                else {
+                    return null;
+                }
+            }
+        }
+        static RecoverItem(item) {
+            if (this.wait.length > 0) {
+                let waitItem = this.wait.shift();
+                item.Request(waitItem);
+            }
+            else {
+                if (this.pool.indexOf(item) == -1) {
+                    this.pool.push(item);
+                }
+            }
+        }
+        static Request(bolck) {
+            let item = this.GetItem();
+            if (item) {
+                item.Request(bolck);
+            }
+            else {
+                this.wait.push(bolck);
+            }
+        }
+    }
+    HRange.MaxNum = 2;
+    HRange.currNum = 0;
+    HRange.pool = [];
+    HRange.wait = [];
+
+    class FileTask {
+        constructor() {
+            this.responseType = "";
+            this.isEndRecoverBlockList = false;
+            this.isEndRecover = false;
+            this.blockList = [];
+            this.blockEndCount = 0;
+            this.loadedSize = 0;
+            this.loadedRate = 0;
+        }
+        RequestSize() {
+            HRHead.RequestSize(this.url, this.OnGetSize, this);
+        }
+        OnGetSize(error, fileSize, url) {
+            this.totalSize = fileSize;
+            this.SpliteBlock();
+            this.RequestBlocksList();
+        }
+        RequestBlocksList() {
+            this.blockEndCount = 0;
+            for (var block of this.blockList) {
+                if (block.isComplete) {
+                    this.blockEndCount++;
+                }
+                else {
+                    HRange.Request(block);
+                }
+            }
+            if (this.blockEndCount >= this.blockList.length) {
+                this.onEnd();
+            }
+        }
+        SpliteBlock() {
+            var size = this.totalSize;
+            var ProcessorCount = FileTask.MaxBlockNum;
+            var singleTmpFileSize = FileTask.singleTmpFileSize;
+            var blockList = this.blockList;
+            var blockSize = Math.floor(size / ProcessorCount);
+            var modSize = this.totalSize % ProcessorCount;
+            var block;
+            if (size < singleTmpFileSize || size <= 0) {
+                block = FileBlock.PoolGetItem();
+                block.fileTask = this;
+                block.index = 0;
+                block.begin = 0;
+                if (size <= 0) {
+                    block.end = -1;
+                }
+                else {
+                    block.end = size - 1;
+                }
+                blockList.push(block);
+            }
+            else {
+                for (var i = 0; i < ProcessorCount; i++) {
+                    block = FileBlock.PoolGetItem();
+                    block.fileTask = this;
+                    block.index = i;
+                    block.begin = i * blockSize;
+                    block.end = (i + 1) * blockSize - 1;
+                    if (i == ProcessorCount - 1) {
+                        block.end += modSize;
+                    }
+                    blockList.push(block);
+                }
+            }
+            console.log("blockList.length=", blockList.length);
+        }
+        Start(url, responseType = "arraybuffer") {
+            this.url = url;
+            this.responseType = responseType;
+            this.RequestSize();
+        }
+        OnBlockEnd(block) {
+            this.blockEndCount++;
+            if (this.blockEndCount >= this.blockList.length) {
+                this.onEnd();
+            }
+        }
+        onEnd() {
+            this.Merge();
+            Laya.Loader.cacheRes(this.path, this.response);
+            if (this.onCompleteHandler) {
+                if (this.callbackObj) {
+                    this.onCompleteHandler.call(this.callbackObj, this.response, this.path);
+                }
+                else {
+                    this.onCompleteHandler(this.response, this.path);
+                }
+            }
+            if (this.isEndRecoverBlockList) {
+                this.RecoverBlockList();
+            }
+            if (this.isEndRecover) {
+                this.PoolRecoverItem();
+            }
+        }
+        RecoverBlockList() {
+            for (var i = 0, len = this.blockList.length; i < len; i++) {
+                var block = this.blockList[i];
+                FileBlock.PoolRecoverItem(block);
+            }
+            this.blockList.length = 0;
+        }
+        Merge() {
+            if (this.responseType == "arraybuffer" || this.responseType == "moz-chunked-arraybuffer" || this.responseType == "ms-stream") {
+                this.MergeArrayBuffer();
+            }
+            else {
+                this.MergeText();
+            }
+        }
+        MergeArrayBuffer() {
+            if (this.blockList.length == 1 && this.blockList[0].responseList.length == 1) {
+                this.response = this.blockList[0].responseList[0];
+            }
+            else {
+                var arr = new ArrayBuffer(this.totalSize);
+                var buff = new Int8Array(arr);
+                for (var i = 0, len = this.blockList.length; i < len; i++) {
+                    var block = this.blockList[i];
+                    block.MergeToBuff(buff);
+                }
+                this.response = arr;
+            }
+        }
+        MergeText() {
+            if (this.blockList.length == 1 && this.blockList[0].responseList.length == 1) {
+                this.response = this.blockList[0].responseList[0];
+            }
+            else {
+                var arr = [];
+                for (var i = 0, len = this.blockList.length; i < len; i++) {
+                    var block = this.blockList[i];
+                    arr.push(...block.responseList);
+                }
+                this.response = arr.join();
+            }
+        }
+        PoolRecoverItem() {
+            this.url = null;
+            this.totalSize = 0;
+            this.loadedSize = 0;
+            this.loadedRate = 0;
+            this.responseType = "";
+            this.response = null;
+            this.isEndRecoverBlockList = false;
+            this.isEndRecover = false;
+            this.RecoverBlockList();
+            this.blockEndCount = 0;
+            this.onCompleteHandler = null;
+            this.callbackObj = null;
+            FileTask.RecoverItem(this);
+        }
+        OnPorgess(loadedSize, totalSize) {
+            if (this.totalSize > 0) {
+                this.loadedSize = 0;
+                for (var i = 0, len = this.blockList.length; i < len; i++) {
+                    this.loadedSize += this.blockList[i].loadedSize;
+                }
+                if (this.loadedSize > 0) {
+                    this.loadedRate = this.loadedSize / this.totalSize;
+                }
+            }
+            else {
+                this.loadedSize = loadedSize;
+                this.totalSize = totalSize;
+                this.loadedRate = this.loadedSize / this.totalSize;
+            }
+            if (this.onProgresssHandler) {
+                if (this.callbackObj) {
+                    this.onProgresssHandler.call(this.callbackObj, this.loadedRate);
+                }
+                else {
+                    this.onProgresssHandler(this.loadedRate);
+                }
+            }
+        }
+        static GetItem() {
+            if (this.pool.length > 0) {
+                return this.pool.shift();
+            }
+            else {
+                return new FileTask();
+            }
+        }
+        static RecoverItem(item) {
+            if (this.pool.indexOf(item) == -1) {
+                this.pool.push(item);
+            }
+        }
+        static Request(path, onCompleteHandler, onProgresssHandler, callbackObj, responseType = "arraybuffer", isEndRecoverBlockList = true, isEndRecover = true) {
+            var res = Laya.Loader.getRes(path);
+            if (res) {
+                if (onCompleteHandler) {
+                    if (callbackObj) {
+                        onCompleteHandler.call(callbackObj, res, path);
+                    }
+                    else {
+                        onCompleteHandler(res, path);
+                    }
+                }
+                return;
+            }
+            var url = Laya.URL.formatURL(path);
+            if (url.indexOf("Monster_2005_gongjianshou_Skin1.zip") != -1) {
+                console.error(url);
+            }
+            let item = this.GetItem();
+            item.path = path;
+            item.onCompleteHandler = onCompleteHandler;
+            item.onProgresssHandler = onProgresssHandler;
+            item.callbackObj = callbackObj;
+            item.isEndRecoverBlockList = isEndRecoverBlockList;
+            item.isEndRecover = isEndRecover;
+            item.Start(url, responseType);
+            return item;
+        }
+        static RequestList(pathList, completeHandler, progressHandler) {
+            let len = pathList.length;
+            if (len == 0) {
+                if (completeHandler) {
+                    completeHandler.runWith(true);
+                }
+                return;
+            }
+            if (progressHandler) {
+                progressHandler.runWith(0);
+            }
+            let loadedNum = 0;
+            let onItemComplete = () => {
+                loadedNum++;
+                if (progressHandler) {
+                    progressHandler.runWith(loadedNum / len);
+                }
+                if (loadedNum >= len) {
+                    if (completeHandler) {
+                        completeHandler.runWith(true);
+                    }
+                }
+            };
+            let onItemProgerss = (rate) => {
+                if (len == 1) {
+                    if (progressHandler) {
+                        progressHandler.runWith(rate);
+                    }
+                }
+            };
+            for (var i = 0; i < len; i++) {
+                var url = pathList[i];
+                var task = this.Request(url, onItemComplete, onItemProgerss, null, "arraybuffer", true, true);
+            }
+        }
+    }
+    FileTask.MaxBlockNum = 2;
+    FileTask.singleTmpFileSize = 1024 * 1024 * 5;
+    FileTask.pool = [];
+    window['FileTask'] = FileTask;
+    window['FileBlock'] = FileBlock;
+    window['HRHead'] = HRHead;
+    window['HRange'] = HRange;
+    FileTask.MaxBlockNum = 5;
+    FileTask.singleTmpFileSize = 1024 * 1024 * 5;
+    HRHead.MaxNum = 5;
+    HRange.MaxNum = 5;
+
+    class JsZipAsync {
+        static loadPath(path, type, callback) {
+            var isUseLaya = false;
+            if (path.indexOf("res3d/") != -1) {
+                if (path.indexOf("Effect_100") != -1 || path.indexOf("Hero_100") != -1) {
+                    isUseLaya = true;
+                }
+            }
+            if (!isUseLaya) {
+                FileTask.Request(path, (res, url) => {
                     if (ZipManager.Instance.zipMap.has(path)) {
                         let zip = ZipManager.Instance.zipMap.get(path);
-                        resolve(zip);
+                        callback.runWith(zip);
                         return;
                     }
                     JSZip.loadAsync(res).then((zip) => {
-                        resolve(zip);
+                        callback.runWith(zip);
                     }).catch((error) => {
-                        console.error(error);
-                        resolve();
+                        console.error(error, path);
+                        callback.runWith(null);
                     });
-                }), null, type, undefined, false);
-            });
-        }
-        static async readAsync(zip, path, type) {
-            return new Promise((resolve) => {
-                zip.file(path).async(type).then((data) => {
-                    resolve(data);
-                }).catch((error) => {
-                    console.error(error);
-                    resolve();
                 });
-            });
+            }
+            else {
+                Laya.loader.load(path, Laya.Handler.create(null, (res) => {
+                    if (ZipManager.Instance.zipMap.has(path)) {
+                        let zip = ZipManager.Instance.zipMap.get(path);
+                        callback.runWith(zip);
+                        return;
+                    }
+                    JSZip.loadAsync(res).then((zip) => {
+                        callback.runWith(zip);
+                    }).catch((error) => {
+                        console.error(error, path);
+                        callback.runWith(null);
+                    });
+                }), null, type);
+            }
         }
-        static read(zip, path, type, callbacker, onComponent) {
+        static read(zip, path, type, callback) {
             zip.file(path).async(type).then((data) => {
-                if (onComponent) {
-                    onComponent.call(callbacker, data);
-                }
+                callback.runWith(data);
             }).catch((error) => {
-                console.error(error);
-                if (onComponent) {
-                    onComponent.call(callbacker, null);
-                }
+                console.error(error, path);
+                callback.runWith(null);
             });
         }
     }
@@ -515,16 +1030,16 @@
             return this;
         }
         async ___createLoadWaitZipAsync(zipPath, url, complete = null, progress = null, type = null, constructParams = null, propertyParams = null, priority = 1, cache = true, ignoreCache = false) {
-            let zip = await ZipManager.Instance.GetZipAsync(zipPath);
-            await AsyncUtil.MAwitFrame();
-            this._loaderCount--;
-            var myComplete = Handler.create(this, (data) => {
-                this._loaderCount++;
-                if (complete) {
-                    complete.runWith(data);
-                }
-            });
-            this.src_createLoad(url, myComplete, progress, type, constructParams, propertyParams, priority, cache, ignoreCache);
+            ZipManager.Instance.GetZip(zipPath, Handler.create(this, () => {
+                this._loaderCount--;
+                var myComplete = Handler.create(this, (data) => {
+                    this._loaderCount++;
+                    if (complete) {
+                        complete.runWith(data);
+                    }
+                });
+                this.src_createLoad(url, myComplete, progress, type, constructParams, propertyParams, priority, cache, ignoreCache);
+            }));
             return this;
         }
         src_load(url, complete = null, progress = null, type = null, priority = 1, cache = true, group = null, ignoreCache = false, useWorkerLoader = Laya.WorkerLoader.enable) {
@@ -550,16 +1065,16 @@
             return this;
         }
         async __loadWaitZipAsync(zipPath, url, complete = null, progress = null, type = null, priority = 1, cache = true, group = null, ignoreCache = false, useWorkerLoader = Laya.WorkerLoader.enable) {
-            let zip = await ZipManager.Instance.GetZipAsync(zipPath);
-            await AsyncUtil.MAwitFrame();
-            this._loaderCount--;
-            var myComplete = Handler.create(this, (data) => {
-                this._loaderCount++;
-                if (complete) {
-                    complete.runWith(data);
-                }
-            });
-            this.src_load(url, myComplete, progress, type, priority, cache, group, ignoreCache, useWorkerLoader);
+            ZipManager.Instance.GetZip(zipPath, Handler.create(this, () => {
+                this._loaderCount--;
+                var myComplete = Handler.create(this, (data) => {
+                    this._loaderCount++;
+                    if (complete) {
+                        complete.runWith(data);
+                    }
+                });
+                this.src_load(url, myComplete, progress, type, priority, cache, group, ignoreCache, useWorkerLoader);
+            }));
             return this;
         }
     }
@@ -585,11 +1100,82 @@
         }
     }
 
+    class WaitCallbackList {
+        constructor() {
+            this.list = [];
+        }
+        add(handler) {
+            this.list.push(handler);
+        }
+        run() {
+            for (var item of this.list) {
+                item.run();
+            }
+        }
+        runWith(data) {
+            for (var item of this.list) {
+                item.runWith(data);
+            }
+        }
+        clear() {
+            this.list.length = 0;
+            this.key = null;
+        }
+        static Get(key) {
+            if (this.map.has(key)) {
+                return this.map.get(key);
+            }
+        }
+        static GetOrCreate(key) {
+            if (this.map.has(key)) {
+                return this.map.get(key);
+            }
+            var item = Laya.Pool.createByClass(WaitCallbackList);
+            item.key = key;
+            this.map.set(key, item);
+            return item;
+        }
+        static Add(key, handler) {
+            var item = this.GetOrCreate(key);
+            item.add(handler);
+        }
+        static Recover(key, item) {
+            item.clear();
+            this.map.delete(key);
+            Laya.Pool.recoverByClass(item);
+        }
+        static Run(key) {
+            var item = this.Get(key);
+            if (item) {
+                item.run();
+                this.Recover(key, item);
+            }
+            else {
+                console.warn("WaitCallbackList没有这个的监听了", key);
+            }
+        }
+        static RunWith(key, data) {
+            var item = this.Get(key);
+            if (item) {
+                item.runWith(data);
+                this.Recover(key, item);
+            }
+            else {
+                console.warn("WaitCallbackList没有这个的监听了", key);
+            }
+        }
+    }
+    WaitCallbackList.map = new Map();
+
+    var Handler$1 = Laya.Handler;
     class ZipManager {
         constructor() {
             this.zipExt = ".zip";
             this.zipExtName = "zip";
             this.srcRootPath = "res3d/Conventional/";
+            this.zipRootPath = "";
+            this.isPve01 = false;
+            this.enablePve01 = false;
             this.resourceVersionManifestReverse = new Map();
             this.zipMap = new Map();
             this.assetMap = new Map();
@@ -605,8 +1191,14 @@
             }
             return ZipManager._Instance;
         }
+        get manifest() {
+            if (this.enablePve01 && this.isPve01) {
+                return this.manifestPve01;
+            }
+            return this._manifest;
+        }
         async InitAsync(manifestPath, srcRootPath, zipRootPath, zipExt, isReplace) {
-            if (this.manifest && !isReplace) {
+            if (this._manifest && !isReplace) {
                 console.log("已经初始了Zip资源清单");
                 return;
             }
@@ -615,11 +1207,16 @@
                 this.zipExtName = zipExt.replace('.', '');
             }
             await AssetManifest.InitAsync(manifestPath, srcRootPath, zipRootPath, zipExt);
-            this.manifest = AssetManifest.Instance;
+            this._manifest = AssetManifest.Instance;
             this.srcRootPath = srcRootPath;
+            this.zipRootPath = zipRootPath;
             ZipManager.enable = true;
             this.InitCode();
             this.InitResourceVersion();
+        }
+        async InitPVE01(pve01manifestPath) {
+            this.manifestPve01 = await AssetManifest.LoadAsync(pve01manifestPath, this.srcRootPath, this.zipRootPath, this.zipExt);
+            this.enablePve01 = true;
         }
         InitCode() {
             if (ZipManager.isInitCode) {
@@ -762,16 +1359,23 @@
             }
             return assetNameList;
         }
-        async GetZipAsync(zipPath) {
+        GetZip(zipPath, callback) {
             var zip;
             if (this.zipMap.has(zipPath)) {
                 zip = this.zipMap.get(zipPath);
+                callback.runWith(zip);
             }
             else {
-                zip = await JsZipAsync.loadPathAsync(zipPath, Laya.Loader.BUFFER);
-                this.zipMap.set(zipPath, zip);
+                WaitCallbackList.Add(zipPath, callback);
+                if (WaitCallbackList.Get(zipPath).list.length == 1) {
+                    JsZipAsync.loadPath(zipPath, Laya.Loader.BUFFER, Handler$1.create(this, (zip) => {
+                        if (zip) {
+                            this.zipMap.set(zipPath, zip);
+                        }
+                        WaitCallbackList.RunWith(zipPath, zip);
+                    }));
+                }
             }
-            return zip;
         }
         HasManifestAssetByUrl(url) {
             var assetPath = this.AssetUrlToPath(url);
@@ -793,10 +1397,11 @@
             }
             return data;
         }
-        async GetAssetDataAsync(url) {
+        GetOrLoadAssetData(url, callback) {
             var assetPath = this.AssetUrlToPath(url);
             if (!this.manifest.HasAssetByPath(assetPath)) {
-                return null;
+                callback.runWith(null);
+                return;
             }
             var data;
             let type = this.manifest.GetEnumZipAssetDataType(assetPath);
@@ -806,39 +1411,52 @@
             if (this.assetMap.has(assetPath)) {
                 data = this.assetMap.get(assetPath);
                 this.AddAssetReference(assetPath);
+                callback.runWith(data);
             }
             else {
-                data = await this.LoadAssetData(assetPath);
-                var assetReferenceCount = this.GetAssetReference(assetPath);
-                if (assetReferenceCount > 0) {
-                    console.error("ZipManager.GetAssetDataAsync 已经存在创建的资源了", assetPath, assetReferenceCount);
+                WaitCallbackList.Add(url, callback);
+                if (WaitCallbackList.Get(url).list.length == 1) {
+                    this.LoadAssetData(assetPath, Handler$1.create(this, (data) => {
+                        var assetReferenceCount = this.GetAssetReference(assetPath);
+                        if (assetReferenceCount > 0) {
+                            console.error("ZipManager.GetAssetDataAsync 已经存在创建的资源了", assetPath, assetReferenceCount);
+                        }
+                        this.AddAssetReference(assetPath);
+                        this.assetMap.set(assetPath, data);
+                        WaitCallbackList.RunWith(url, data);
+                    }));
                 }
-                this.AddAssetReference(assetPath);
-                this.assetMap.set(assetPath, data);
             }
-            return data;
         }
-        async LoadAssetData(assetPath) {
+        LoadAssetData(assetPath, callback) {
             let assetName = this.manifest.GetAssetNameByPath(assetPath);
             let zipPath = this.manifest.GetAssetZipPath(assetName);
             let type = this.manifest.GetEnumZipAssetDataType(assetName);
-            let zip = await this.GetZipAsync(zipPath);
-            if (!zip) {
-                console.log("没有Zip", zipPath, assetPath);
-                return null;
-            }
-            let data = await JsZipAsync.readAsync(zip, assetName, type);
-            switch (type) {
-                case EnumZipAssetDataType.string:
-                    data = JSON.parse(data);
-                    break;
-                case EnumZipAssetDataType.base64:
-                    data = "data:image/png;base64," + data;
-                    this.imageCount++;
-                    break;
-            }
-            this.AddZipUseAsset(zipPath, assetPath);
-            return data;
+            this.GetZip(zipPath, Handler$1.create(this, (zip) => {
+                if (!zip) {
+                    console.log("没有Zip", zipPath, assetPath);
+                    callback.runWith(null);
+                    return;
+                }
+                JsZipAsync.read(zip, assetName, type, Handler$1.create(this, (data) => {
+                    if (data == null) {
+                        console.log("zip读取资源失败", zipPath, assetPath);
+                        callback.runWith(null);
+                        return;
+                    }
+                    switch (type) {
+                        case EnumZipAssetDataType.string:
+                            data = JSON.parse(data);
+                            break;
+                        case EnumZipAssetDataType.base64:
+                            data = "data:image/png;base64," + data;
+                            this.imageCount++;
+                            break;
+                    }
+                    this.AddZipUseAsset(zipPath, assetPath);
+                    callback.runWith(data);
+                }));
+            }));
         }
         async LoadAssetZipListAsync(assetPathList, callbacker, onProgerss) {
             let assetNameList = this.AssetPathListToAssetNameList(assetPathList);
@@ -872,14 +1490,14 @@
                         continue;
                     }
                     else {
-                        JsZipAsync.loadPath(zipPath, Laya.Loader.BUFFER, this, (zip) => {
+                        JsZipAsync.loadPath(zipPath, Laya.Loader.BUFFER, Handler$1.create(this, (zip) => {
                             this.zipMap.set(zipPath, zip);
                             loadNum++;
                             progerssFun(loadNum, loadTotal, zipPath);
                             if (loadNum >= loadTotal) {
                                 resolve();
                             }
-                        });
+                        }));
                     }
                 }
             });
@@ -945,7 +1563,7 @@
                         let assetName = assetNameList[j];
                         let assetPath = this.AssetNameToPath(assetName);
                         let type = this.manifest.GetEnumZipAssetDataType(assetName);
-                        JsZipAsync.read(zip, assetName, type, this, (data) => {
+                        JsZipAsync.read(zip, assetName, type, Handler$1.create(this, (data) => {
                             assetNameLoadedCount++;
                             if (data) {
                                 switch (type) {
@@ -968,9 +1586,23 @@
                             if (assetNameLoadedCount >= assetNameTotal) {
                                 AsyncUtil.ResolveDelayCall(resolve);
                             }
-                        });
+                        }));
                     }
                 }
+            });
+        }
+        async GetZipAsync(zipPath) {
+            return new Promise((resolve) => {
+                this.GetZip(zipPath, Handler$1.create(this, (zip) => {
+                    resolve(zip);
+                }));
+            });
+        }
+        async GetOrLoadAssetDataAsync(url) {
+            return new Promise((resolve) => {
+                this.GetOrLoadAssetData(url, Handler$1.create(this, (data) => {
+                    resolve(data);
+                }));
             });
         }
     }
@@ -1285,6 +1917,7 @@
     DebugResources.laya3dEndNumMap = new Map();
     window['DebugResources'] = DebugResources;
 
+    var Handler$2 = Laya.Handler;
     class PreloadZipList {
         constructor(zipPathList, assetPathList) {
             this.assetPathList = [];
@@ -1293,6 +1926,9 @@
             this.total = 0;
             this.loadIndex = 0;
             this.unzipIndex = 0;
+            this.loadZipIndex = 0;
+            this.loadedZipIndex = 0;
+            this.loadZipOnceNum = 10;
             this.zipPathList = zipPathList;
             this.assetPathList = assetPathList;
             this.loadIndex = 0;
@@ -1309,8 +1945,134 @@
             await this.LoadListAsync();
             await this.UnzipListAsync();
         }
+        Start(completeHandler, progressHandler) {
+            if (this.total == 0) {
+                if (completeHandler)
+                    completeHandler.run();
+                return;
+            }
+            let time = Laya.timer.currTimer;
+            this.LoadList(Handler$2.create(this, () => {
+                console.log("加载Zip完成", Laya.timer.currTimer - time);
+                let time2 = Laya.timer.currTimer;
+                this.LoadZipList(Handler$2.create(this, () => {
+                    console.log("装载Zip完成", Laya.timer.currTimer - time2);
+                    let time3 = Laya.timer.currTimer;
+                    this.UnzipList(Handler$2.create(this, () => {
+                        console.log("解压zip完成", Laya.timer.currTimer - time3);
+                        console.log("加载总费时", Laya.timer.currTimer - time);
+                        if (progressHandler)
+                            progressHandler.recover();
+                        if (completeHandler)
+                            completeHandler.run();
+                    }), Handler$2.create(this, (progress) => {
+                        if (progressHandler)
+                            progressHandler.runWith(progress * 0.3 + 0.7);
+                    }, null, false));
+                }), Handler$2.create(this, (progress) => {
+                    if (progressHandler)
+                        progressHandler.runWith(progress * 0.2 + 0.5);
+                }, null, false));
+            }), Handler$2.create(this, (progress) => {
+                if (progressHandler)
+                    progressHandler.runWith(progress * 0.5);
+            }, null, false));
+        }
         Stop() {
             this.isStop = true;
+        }
+        LoadList(completeHandler, progressHandler) {
+            if (this.total == 0) {
+                if (completeHandler)
+                    completeHandler.run();
+                return;
+            }
+            this.LoadList2(Handler$2.create(this, (result) => {
+                if (result == false) {
+                    Laya.timer.frameOnce(30, this, () => {
+                        this.LoadList(completeHandler);
+                    });
+                }
+                else {
+                    if (progressHandler) {
+                        progressHandler.runWith(1);
+                        progressHandler.recover();
+                    }
+                    if (completeHandler)
+                        completeHandler.runWith(result);
+                }
+            }), progressHandler);
+        }
+        LoadList2(completeHandler, progressHandler) {
+            FileTask.RequestList(this.zipPathList, completeHandler, progressHandler);
+        }
+        LoadZipList(completeHandler, progressHandler) {
+            if (this.total == 0) {
+                if (completeHandler)
+                    completeHandler.run();
+                return;
+            }
+            var index = 0;
+            var len = this.zipPathList.length;
+            for (var i = 0; i < len; i++) {
+                ZipManager.Instance.GetZip(this.zipPathList[this.loadZipIndex], Handler$2.create(this, () => {
+                    index++;
+                    if (progressHandler)
+                        progressHandler.runWith(index / this.total);
+                    if (index >= this.total) {
+                        if (progressHandler)
+                            progressHandler.recover();
+                        if (completeHandler)
+                            completeHandler.run();
+                    }
+                }));
+            }
+        }
+        LoadZipOnce(completeHandler, progressHandler) {
+            for (let i = 0; i < this.loadZipOnceNum; i++) {
+                ZipManager.Instance.GetZip(this.zipPathList[this.loadZipIndex], Handler$2.create(this, () => {
+                    this.loadedZipIndex++;
+                    if (progressHandler)
+                        progressHandler.runWith(this.loadedZipIndex / this.total);
+                    if (this.loadedZipIndex >= this.total) {
+                        if (progressHandler)
+                            progressHandler.recover();
+                        if (completeHandler)
+                            completeHandler.run();
+                    }
+                }));
+                this.loadZipIndex++;
+                if (this.loadZipIndex >= this.total) {
+                    break;
+                }
+            }
+            if (this.loadZipIndex >= this.total) {
+                return;
+            }
+            Laya.timer.frameOnce(1, this, this.LoadZipOnce, [completeHandler, progressHandler]);
+        }
+        UnzipList(completeHandler, progressHandler) {
+            var index = 0;
+            var len = this.assetPathList.length;
+            if (this.total == 0) {
+                if (completeHandler)
+                    completeHandler.run();
+                return;
+            }
+            for (let i = 0; i < len; i++) {
+                let assetPath = this.assetPathList[i];
+                ZipManager.Instance.GetOrLoadAssetData(assetPath, Handler$2.create(this, () => {
+                    index++;
+                    if (progressHandler)
+                        progressHandler.runWith(index / len);
+                    if (index >= len) {
+                        if (progressHandler)
+                            progressHandler.recover();
+                        if (completeHandler)
+                            completeHandler.run();
+                    }
+                }));
+            }
         }
         async LoadListAsync() {
             if (this.total == 0) {
@@ -1351,10 +2113,10 @@
                     }
                     let assetPath = this.assetPathList[this.unzipIndex];
                     if (i < onceNum - 1) {
-                        ZipManager.Instance.GetAssetDataAsync(assetPath);
+                        ZipManager.Instance.GetOrLoadAssetDataAsync(assetPath);
                     }
                     else {
-                        await ZipManager.Instance.GetAssetDataAsync(assetPath);
+                        await ZipManager.Instance.GetOrLoadAssetDataAsync(assetPath);
                     }
                     this.unzipIndex++;
                 }
@@ -1386,6 +2148,28 @@
         }
         Stop() {
             this.isStop = true;
+        }
+        LoadList(completeHandler, progressHandler) {
+            if (this.total == 0) {
+                if (completeHandler)
+                    completeHandler.run();
+                return;
+            }
+            var time = Laya.timer.currTimer;
+            var loadedIndex = 0;
+            for (let i = 0; i < this.total; i++) {
+                let assetPath = this.assetPathList[i];
+                Laya.loader.create(assetPath, Laya.Handler.create(null, (res) => {
+                    loadedIndex++;
+                    if (progressHandler)
+                        progressHandler.runWith(loadedIndex / this.total);
+                    if (loadedIndex >= this.total) {
+                        console.log("加载预设完成", Laya.timer.currTimer - time);
+                        if (completeHandler)
+                            completeHandler.run();
+                    }
+                }));
+            }
         }
         async LoadListAsync() {
             if (this.total == 0) {
@@ -1425,6 +2209,7 @@
         }
     }
 
+    var Handler$3 = Laya.Handler;
     class PrefabManager {
         static get Instance() {
             if (!PrefabManager._Instance) {
@@ -1478,14 +2263,16 @@
             this.preloadZip = null;
             this.preloadAsset = null;
         }
-        async PreloadPrefabList(resIdList) {
+        LoadPrefabList(resIdList, isLoadPrefab = true, completeHandler, progressHandler) {
             this.StopPreload();
             if (!ZipManager.enable) {
-                await this.PreloadPrefabList2(resIdList);
+                this.PreloadPrefabList2(resIdList);
                 return;
             }
             let len = resIdList.length;
             if (len == 0) {
+                if (completeHandler)
+                    completeHandler.run();
                 return;
             }
             var manifest = ZipManager.Instance.manifest;
@@ -1514,17 +2301,47 @@
                     assetPathList.push(dependencieAssetPath);
                     tmpMap.set(dependencieAssetPath, true);
                 }
-                assetPathList.push(assetPath);
                 prefabAssetPathList.push(assetPath);
             }
             let assetNameList = ZipManager.Instance.AssetPathListToAssetNameList(prefabAssetPathList);
             let zipPathList = manifest.GetAssetListDependencieZipPathList(assetNameList);
             this.preloadZip = new PreloadZipList(zipPathList, assetPathList);
-            this.preloadAsset = new PreloadAssetList(assetPathList);
-            await this.preloadZip.StartAsync();
-            if (this.preloadAsset) {
-                await this.preloadAsset.StartAsync();
-            }
+            this.preloadAsset = new PreloadAssetList(prefabAssetPathList);
+            this.preloadZip.Start(Handler$3.create(this, () => {
+                if (isLoadPrefab) {
+                    this.preloadAsset.LoadList(Handler$3.create(this, () => {
+                        if (progressHandler)
+                            progressHandler.recover();
+                        if (completeHandler)
+                            completeHandler.run();
+                    }), Handler$3.create(this, (progress) => {
+                        if (progressHandler)
+                            progressHandler.runWith(progress * 0.3 + 0.7);
+                    }, null, false));
+                }
+                else {
+                    if (progressHandler)
+                        progressHandler.recover();
+                    if (completeHandler)
+                        completeHandler.run();
+                }
+            }), Handler$3.create(this, (progress) => {
+                if (isLoadPrefab) {
+                    if (progressHandler)
+                        progressHandler.runWith(progress * 0.7);
+                }
+                else {
+                    if (progressHandler)
+                        progressHandler.runWith(progress);
+                }
+            }, null, false));
+        }
+        async PreloadPrefabListAsync(resIdList, isLoadPrefab = true, progressHandler) {
+            return new Promise((resolve) => {
+                this.LoadPrefabList(resIdList, isLoadPrefab, Handler$3.create(this, () => {
+                    resolve();
+                }), progressHandler);
+            });
         }
         async PreloadPrefabList2(resIdList) {
             let assetPathList = [];

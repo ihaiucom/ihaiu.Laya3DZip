@@ -62,20 +62,33 @@ export default class LayaExtends_LoaderManager
     
     async ___createLoadWaitZipAsync(zipPath:string, url: any, complete: Handler|null = null, progress: Handler|null = null, type: string|null = null, constructParams: any[]|null = null, propertyParams: any = null, priority: number = 1, cache: boolean = true, ignoreCache: boolean = false): Laya.LoaderManager 
     {
-        // console.log("___createLoadWaitZipAsync await",Laya.loader._loaderCount, url, zipPath);
-        let zip = await ZipManager.Instance.GetZipAsync(zipPath);
-        await AsyncUtil.MAwitFrame();
-        // console.log("___createLoadWaitZipAsync set", Laya.loader._loaderCount,url, zipPath);
-        this._loaderCount --;
-        var myComplete = Handler.create(this, (data)=>
-        {
-            this._loaderCount ++;
-            if(complete)
+        ZipManager.Instance.GetZip(zipPath, Handler.create(this, ()=>{
+            this._loaderCount --;
+            var myComplete = Handler.create(this, (data)=>
             {
-                complete.runWith(data);
-            }
-        })
-        this.src_createLoad(url, myComplete, progress, type, constructParams, propertyParams, priority,cache, ignoreCache);
+                this._loaderCount ++;
+                if(complete)
+                {
+                    complete.runWith(data);
+                }
+            })
+            this.src_createLoad(url, myComplete, progress, type, constructParams, propertyParams, priority,cache, ignoreCache);
+        }))
+
+        // // console.log("___createLoadWaitZipAsync await",Laya.loader._loaderCount, url, zipPath);
+        // let zip = await ZipManager.Instance.GetZipAsync(zipPath);
+        // await AsyncUtil.MAwitFrame();
+        // // console.log("___createLoadWaitZipAsync set", Laya.loader._loaderCount,url, zipPath);
+        // this._loaderCount --;
+        // var myComplete = Handler.create(this, (data)=>
+        // {
+        //     this._loaderCount ++;
+        //     if(complete)
+        //     {
+        //         complete.runWith(data);
+        //     }
+        // })
+        // this.src_createLoad(url, myComplete, progress, type, constructParams, propertyParams, priority,cache, ignoreCache);
         return <any>this;
     }
 
@@ -120,20 +133,32 @@ export default class LayaExtends_LoaderManager
 
     async __loadWaitZipAsync(zipPath:string, url: string|string[]|any[], complete: Handler|null = null, progress: Handler|null = null, type: string|null = null, priority: number = 1, cache: boolean = true, group: string|null = null, ignoreCache: boolean = false, useWorkerLoader: boolean = Laya.WorkerLoader.enable): Laya.LoaderManager 
     {
-        // console.log("__loadWaitZipAsync await",Laya.loader._loaderCount, url, zipPath);
-        let zip = await ZipManager.Instance.GetZipAsync(zipPath);
-        await AsyncUtil.MAwitFrame();
-        // console.log("__loadWaitZipAsync set", Laya.loader._loaderCount,url, zipPath);
-        this._loaderCount --;
-        var myComplete = Handler.create(this, (data)=>
-        {
-            this._loaderCount ++;
-            if(complete)
+        ZipManager.Instance.GetZip(zipPath, Handler.create(this, ()=>{
+            this._loaderCount --;
+            var myComplete = Handler.create(this, (data)=>
             {
-                complete.runWith(data);
-            }
-        })
-        this.src_load(url, myComplete, progress, type, priority, cache, group, ignoreCache, useWorkerLoader);
+                this._loaderCount ++;
+                if(complete)
+                {
+                    complete.runWith(data);
+                }
+            })
+            this.src_load(url, myComplete, progress, type, priority, cache, group, ignoreCache, useWorkerLoader);
+        }))
+        // // console.log("__loadWaitZipAsync await",Laya.loader._loaderCount, url, zipPath);
+        // let zip = await ZipManager.Instance.GetZipAsync(zipPath);
+        // await AsyncUtil.MAwitFrame();
+        // // console.log("__loadWaitZipAsync set", Laya.loader._loaderCount,url, zipPath);
+        // this._loaderCount --;
+        // var myComplete = Handler.create(this, (data)=>
+        // {
+        //     this._loaderCount ++;
+        //     if(complete)
+        //     {
+        //         complete.runWith(data);
+        //     }
+        // })
+        // this.src_load(url, myComplete, progress, type, priority, cache, group, ignoreCache, useWorkerLoader);
         return <any>this;
     }
 

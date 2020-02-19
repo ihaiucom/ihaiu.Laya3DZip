@@ -4,6 +4,7 @@ import DebugResources from "../DebugResources/DebugResources";
 import AssetManifest from "./AssetManifest";
 import PreloadZipList from "./PreloadZipList";
 import PreloadAssetList from "./PreloadAssetList";
+import Handler = Laya.Handler;
 
 export default class PrefabManager
 {
@@ -97,13 +98,14 @@ export default class PrefabManager
         this.preloadAsset = null;
     }
 
+    
     /** 隐藏默默加载 */
-    public async PreloadPrefabList(resIdList:string[])
+    public LoadPrefabList(resIdList:string[], isLoadPrefab: boolean = true, completeHandler?: Handler, progressHandler?: Handler)
     {
         this.StopPreload();
         if(!ZipManager.enable)
         {
-            await this.PreloadPrefabList2(resIdList);
+            this.PreloadPrefabList2(resIdList);
             return;
         }
 
@@ -111,6 +113,7 @@ export default class PrefabManager
         let len = resIdList.length;
         if(len == 0)
         {
+            if(completeHandler) completeHandler.run();
             return;
         }
 
@@ -152,7 +155,7 @@ export default class PrefabManager
                 assetPathList.push(dependencieAssetPath);
                 tmpMap.set(dependencieAssetPath, true);
             }
-            assetPathList.push(assetPath);
+            // assetPathList.push(assetPath);
             prefabAssetPathList.push(assetPath);
         }
         
@@ -160,13 +163,62 @@ export default class PrefabManager
         let zipPathList = manifest.GetAssetListDependencieZipPathList(assetNameList);
 
         this.preloadZip = new PreloadZipList(zipPathList, assetPathList);
-        this.preloadAsset = new PreloadAssetList(assetPathList);
+        this.preloadAsset = new PreloadAssetList(prefabAssetPathList);
 
-        await this.preloadZip.StartAsync();
-        if(this.preloadAsset)
-        {
-            await this.preloadAsset.StartAsync();
-        }
+        this.preloadZip.Start(
+            Handler.create(this, ()=>{
+                if(isLoadPrefab)
+                {
+                    this.preloadAsset.LoadList(
+                        
+                        Handler.create(this, ()=>{
+                            if(progressHandler) progressHandler.recover();
+                            if(completeHandler) completeHandler.run();
+                        }),
+
+                        // 加载prefab进度
+                        Handler.create(this, (progress)=>{
+                            if(progressHandler) progressHandler.runWith(progress * 0.3 + 0.7);
+                        }, null, false)
+                    );
+                }
+                else
+                {
+                    if(progressHandler) progressHandler.recover();
+                    if(completeHandler) completeHandler.run();
+                }
+            }),
+            // 加载Zip进度
+            Handler.create(this, (progress)=>{
+                if(isLoadPrefab)
+                {
+                    if(progressHandler) progressHandler.runWith(progress * 0.7);
+                }
+                else
+                {
+                    if(progressHandler) progressHandler.runWith(progress);
+                }
+            }, null, false),
+        );
+
+        // await this.preloadZip.StartAsync();
+        // if(this.preloadAsset)
+        // {
+        //     await this.preloadAsset.StartAsync();
+        // }
+       
+    }
+
+    /** 隐藏默默加载 */
+    public async PreloadPrefabListAsync(resIdList:string[], isLoadPrefab: boolean = true, progressHandler?: Handler)
+    {
+        return new Promise((resolve)=>{
+            this.LoadPrefabList(resIdList, isLoadPrefab, Handler.create(this, ()=>
+            {
+                resolve();
+            }),
+            progressHandler)
+        });
        
     }
 

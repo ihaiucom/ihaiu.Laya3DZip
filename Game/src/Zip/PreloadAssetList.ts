@@ -36,6 +36,32 @@ export default class PreloadAssetList
         this.isStop = true;
     }
 
+    
+    LoadList(completeHandler?: Handler, progressHandler?: Handler)
+    {
+        if(this.total == 0)
+        {
+            if(completeHandler) completeHandler.run();
+            return;
+        }
+        var time = Laya.timer.currTimer;
+        var loadedIndex = 0;
+        for(let i = 0; i < this.total; i ++)
+        {
+            let assetPath = this.assetPathList[i];
+            Laya.loader.create(assetPath, Laya.Handler.create(null, (res)=>
+            {
+                loadedIndex++;
+                if(progressHandler) progressHandler.runWith(loadedIndex / this.total);
+                if(loadedIndex >= this.total)
+                {
+                    console.log("加载预设完成", Laya.timer.currTimer-time);
+                    if(completeHandler) completeHandler.run();
+                }
+            }));
+        }
+    }
+
 
     async LoadListAsync()
     {

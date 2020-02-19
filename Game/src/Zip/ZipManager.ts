@@ -6,7 +6,8 @@ import DebugResources from "../DebugResources/DebugResources";
 import AsyncUtil from "./AsyncUtil";
 import LayaExtends_LoaderManager from "./LayaExtends/LayaExtends_LoaderManager";
 import LayaExtends_Resouces from "./LayaExtends/LayaExtends_Resouces";
-
+import Handler = Laya.Handler;
+import WaitCallbackList from "./WaitCallbackList";
 export default class ZipManager
 {
     private static _Instance: ZipManager;
@@ -23,16 +24,24 @@ export default class ZipManager
     zipExt = ".zip";
     zipExtName = "zip";
     srcRootPath = "res3d/Conventional/";
-
+    zipRootPath = "";
     /** 资源清单 */
-    manifest:AssetManifest;
+    _manifest:AssetManifest;
+    get manifest():AssetManifest
+    {
+        if(this.enablePve01 && this.isPve01)
+        {
+            return this.manifestPve01;
+        }
+        return this._manifest;
+    }
 
     static enable: boolean = false;
 
     /** 初始化 */
     async InitAsync(manifestPath:string, srcRootPath: string, zipRootPath: string, zipExt?:string, isReplace?: boolean)
     {
-        if(this.manifest && !isReplace)
+        if(this._manifest && !isReplace)
         {
             console.log("已经初始了Zip资源清单");
             return;
@@ -45,11 +54,23 @@ export default class ZipManager
         }
 
         await AssetManifest.InitAsync(manifestPath, srcRootPath,zipRootPath, zipExt);
-        this.manifest = AssetManifest.Instance;
+        this._manifest = AssetManifest.Instance;
         this.srcRootPath = srcRootPath;
+        this.zipRootPath = zipRootPath;
         ZipManager.enable = true;
         this.InitCode();
         this.InitResourceVersion();
+    }
+
+    /** 资源清单 */
+    manifestPve01:AssetManifest;
+
+    isPve01: boolean = false;
+    enablePve01: boolean = false;
+    async InitPVE01(pve01manifestPath:string)
+    {
+        this.manifestPve01 = await AssetManifest.LoadAsync(pve01manifestPath, this.srcRootPath, this.zipRootPath, this.zipExt);
+        this.enablePve01 = true;
     }
 
 
@@ -292,20 +313,33 @@ export default class ZipManager
     }
 
 
+
+    
     /** 获取Zip */
-    public async GetZipAsync(zipPath:string): Promise<JSZip>
+    public GetZip(zipPath:string, callback: Handler)
     {
         var zip:JSZip;
         if(this.zipMap.has(zipPath))
         {
             zip = this.zipMap.get(zipPath);
+            callback.runWith(zip);
         }
         else
         {
-            zip = await JsZipAsync.loadPathAsync(zipPath, Laya.Loader.BUFFER);
-            this.zipMap.set(zipPath, zip);
+            
+            WaitCallbackList.Add(zipPath, callback);
+            if(WaitCallbackList.Get(zipPath).list.length == 1)
+            {
+                JsZipAsync.loadPath(zipPath, Laya.Loader.BUFFER, Handler.create(this, (zip)=>
+                {
+                    if(zip)
+                    {
+                        this.zipMap.set(zipPath, zip);
+                    }
+                    WaitCallbackList.RunWith(zipPath, zip);
+                }));
+            }
         }
-        return zip;
     }
 
     /** 获取Zip是否存在该资源 */
@@ -317,7 +351,7 @@ export default class ZipManager
 
     
     loadImageCount = 0;
-    /** 获取资源内容 */
+    /** 获取资源内容， 如果没有缓存资源就返回null */
     public GetAssetData(url:string): any
     {
         var assetPath:string = this.AssetUrlToPath(url);
@@ -345,12 +379,13 @@ export default class ZipManager
 
 
     /** 获取资源内容 */
-    public async GetAssetDataAsync(url:string): Promise<any>
+    public GetOrLoadAssetData(url:string, callback: Handler)
     {
         var assetPath:string = this.AssetUrlToPath(url);
         if(!this.manifest.HasAssetByPath(assetPath))
         {
-            return null;
+            callback.runWith(null);
+            return;
         }
         
         var data:any;
@@ -366,53 +401,78 @@ export default class ZipManager
         {
             data = this.assetMap.get(assetPath);
             this.AddAssetReference(assetPath);
+            callback.runWith(data);
         }
         else
         {
-            data = await this.LoadAssetData(assetPath);
-            var assetReferenceCount = this.GetAssetReference(assetPath);
-            if(assetReferenceCount > 0)
+            WaitCallbackList.Add(url, callback);
+            if(WaitCallbackList.Get(url).list.length == 1)
             {
-                console.error("ZipManager.GetAssetDataAsync 已经存在创建的资源了", assetPath, assetReferenceCount);
+                this.LoadAssetData(assetPath, Handler.create(this, (data)=>
+                {
+                    var assetReferenceCount = this.GetAssetReference(assetPath);
+                    if(assetReferenceCount > 0)
+                    {
+                        console.error("ZipManager.GetAssetDataAsync 已经存在创建的资源了", assetPath, assetReferenceCount);
+                    }
+                    this.AddAssetReference(assetPath);
+                    this.assetMap.set(assetPath, data);
+                    WaitCallbackList.RunWith(url, data);
+                }));
             }
-            this.AddAssetReference(assetPath);
-            this.assetMap.set(assetPath, data);
         }
-        return data;
     }
+    
 
     imageCount = 0;
+
     
     /** 加载资源内容 */
-    private async LoadAssetData(assetPath:string): Promise<any>
+    private LoadAssetData(assetPath:string, callback: Handler)
     {
         let assetName = this.manifest.GetAssetNameByPath(assetPath);
         
 
         let zipPath = this.manifest.GetAssetZipPath(assetName);
         let type = this.manifest.GetEnumZipAssetDataType(assetName);
-        let zip = await this.GetZipAsync(zipPath);
-        
-        if(!zip)
+
+        this.GetZip(zipPath, Handler.create(this, (zip: JSZip)=>
         {
-            console.log("没有Zip", zipPath, assetPath);
-            return null;
-        }
-        
-        let data = await JsZipAsync.readAsync(zip, assetName, type);
-        switch(type)
-        {
-            case EnumZipAssetDataType.string:
-                data = JSON.parse(data);
-                break;
-            case EnumZipAssetDataType.base64:
-                data = "data:image/png;base64," + data;
-                this.imageCount ++;
-                break;
-        }
-        this.AddZipUseAsset(zipPath, assetPath);
-        return data;
+            if(!zip)
+            {
+                console.log("没有Zip", zipPath, assetPath);
+                callback.runWith(null);
+                return;
+            }
+            
+
+            JsZipAsync.read(zip, assetName, type, Handler.create(this, (data)=>
+            {
+                if(data == null)
+                {
+                    console.log("zip读取资源失败", zipPath, assetPath);
+                    callback.runWith(null);
+                    return;
+                }
+                    
+                switch(type)
+                {
+                    case EnumZipAssetDataType.string:
+                        data = JSON.parse(data);
+                        break;
+                    case EnumZipAssetDataType.base64:
+                        data = "data:image/png;base64," + data;
+                        this.imageCount ++;
+                        break;
+                }
+                this.AddZipUseAsset(zipPath, assetPath);
+                callback.runWith(data);
+            }))
+
+        }));
     }
+    
+    
 
     /** 加载资源用到的所有Zip */
     public async LoadAssetZipListAsync(assetPathList: string[], callbacker?:any, onProgerss?:((i, count, rate, path)=>any))
@@ -466,7 +526,7 @@ export default class ZipManager
                 }
                 else
                 {
-                    JsZipAsync.loadPath(zipPath, Laya.Loader.BUFFER, this, (zip)=>
+                    JsZipAsync.loadPath(zipPath, Laya.Loader.BUFFER, Handler.create(this, (zip)=>
                     {
                         this.zipMap.set(zipPath, zip);
                         loadNum ++;
@@ -476,7 +536,8 @@ export default class ZipManager
                             resolve();
                             // ZipManager.ResolveDelayCall(resolve);
                         }
-                    })
+                    }));
+
                 }
 
                 
@@ -581,8 +642,8 @@ export default class ZipManager
                     let assetPath = this.AssetNameToPath(assetName);
                     let type = this.manifest.GetEnumZipAssetDataType(assetName);
 
-                    JsZipAsync.read(zip, assetName, type, this, (data)=>
-                    {
+                    JsZipAsync.read(zip, assetName, type, Handler.create(this, (data)=>{
+
                         assetNameLoadedCount ++;
                         if(data)
                         {
@@ -611,7 +672,8 @@ export default class ZipManager
                         {
                             AsyncUtil.ResolveDelayCall(resolve);
                         }
-                    })
+                    }));
+                    
                 }
 
 
@@ -625,7 +687,27 @@ export default class ZipManager
     }
 
 
+    /** 获取Zip */
+    public async GetZipAsync(zipPath:string): Promise<JSZip>
+    {
+        return new Promise<JSZip>((resolve)=>{
+            this.GetZip(zipPath, Handler.create(this, (zip)=>{
+                resolve(zip);
+            }))
+        });
+    }
 
+
+    
+    /** 获取资源内容 */
+    public async GetOrLoadAssetDataAsync(url:string): Promise<any>
+    {
+        return new Promise<JSZip>((resolve)=>{
+            this.GetOrLoadAssetData(url, Handler.create(this, (data)=>{
+                resolve(data);
+            }));
+        });
+    }
 
 }
 

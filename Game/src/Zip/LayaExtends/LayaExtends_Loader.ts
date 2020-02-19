@@ -128,28 +128,46 @@ export default class LayaExtends_Loader
             return;
         }
 
-        var data:any;
-        if(LayaExtends_Loader.UseAsync)
-        {
-            data =  await ZipManager.Instance.GetAssetDataAsync(url);
-        }
-        else
-        {
-            data =  ZipManager.Instance.GetAssetData(url);
-        }
+        ZipManager.Instance.GetOrLoadAssetData(url, Handler.create(this, (data)=>{
+            if(data)
+            {
+                Laya.timer.frameOnce(1, this, ()=>{
+                    // console.log("_loadHttpRequest ", url);
+                    if(onProcess) onProcess.call(onLoadCaller, 1);
+                    onLoad.call(onLoadCaller, data)
+                })
+                return;
+            }
+            else
+            {
+                // console.log("src_loadHttpRequest ", url);
+                this.src_loadHttpRequest(url, contentType, onLoadCaller, onLoad, onProcessCaller, onProcess, onErrorCaller, onError);
+            }
+        }))
 
-        if(data)
-        {
-            // console.log("_loadHttpRequest ", url);
-            if(onProcess) onProcess.call(onLoadCaller, 1);
-            onLoad.call(onLoadCaller, data)
-            return;
-        }
-        else
-        {
-            // console.log("src_loadHttpRequest ", url);
-            this.src_loadHttpRequest(url, contentType, onLoadCaller, onLoad, onProcessCaller, onProcess, onErrorCaller, onError);
-        }
+
+        // var data:any;
+        // if(LayaExtends_Loader.UseAsync)
+        // {
+        //     data =  await ZipManager.Instance.GetOrLoadAssetDataAsync(url);
+        // }
+        // else
+        // {
+        //     data =  ZipManager.Instance.GetAssetData(url);
+        // }
+
+        // if(data)
+        // {
+        //     // console.log("_loadHttpRequest ", url);
+        //     if(onProcess) onProcess.call(onLoadCaller, 1);
+        //     onLoad.call(onLoadCaller, data)
+        //     return;
+        // }
+        // else
+        // {
+        //     // console.log("src_loadHttpRequest ", url);
+        //     this.src_loadHttpRequest(url, contentType, onLoadCaller, onLoad, onProcessCaller, onProcess, onErrorCaller, onError);
+        // }
 
     }
 
@@ -162,26 +180,32 @@ export default class LayaExtends_Loader
     private async _loadHtmlImage(url:string, onLoadCaller, onLoad, onErrorCaller, onError) 
     {
         
-        var data:any;
-        if(LayaExtends_Loader.UseAsync)
-        {
-            data =  await ZipManager.Instance.GetAssetDataAsync(url);
-        }
-        else
-        {
-            data =  ZipManager.Instance.GetAssetData(url);
-        }
+        ZipManager.Instance.GetOrLoadAssetData(url, Handler.create(this, (data)=>{
+            if(data)
+            {
+                
+                Laya.timer.frameOnce(1, this, ()=>{
+                    // console.log("_loadHtmlImage ", url);
+                    this.src_loadHtmlImage(data, onLoadCaller, onLoad, onErrorCaller, onError)
+                })
+            }
+            else
+            {
+                // console.log("src_loadHtmlImage ", url);
+                this.src_loadHtmlImage(url, onLoadCaller, onLoad, onErrorCaller, onError) 
+            }
+        }))
+
+        // if(LayaExtends_Loader.UseAsync)
+        // {
+        //     data =  await ZipManager.Instance.GetOrLoadAssetDataAsync(url);
+        // }
+        // else
+        // {
+        //     data =  ZipManager.Instance.GetAssetData(url);
+        // }
 
         
-        if(data)
-        {
-            // console.log("_loadHtmlImage ", url);
-            this.src_loadHtmlImage(data, onLoadCaller, onLoad, onErrorCaller, onError)
-        }
-        else
-        {
-            // console.log("src_loadHtmlImage ", url);
-            this.src_loadHtmlImage(url, onLoadCaller, onLoad, onErrorCaller, onError) 
-        }
+        
     }
 }

@@ -1,4 +1,4 @@
-// v1.2.1
+// v1.2.0
 // publish 2.x 也是用这个文件，需要做兼容
 let isPublish2 = process.argv[2].includes("publish_vivogame.js") && process.argv[3].includes("--evn=publish2");
 // 获取Node插件和工作路径
@@ -96,7 +96,7 @@ gulp.task("createGlobalQGame_VIVO", ["copyPlatformFile_VIVO"], function() {
 	return new Promise((resolve, reject) => { // 远程版本号
 		childProcess.exec("npm view  @vivo-minigame/cli version", function(error, stdout, stderr) {
 			if (!stdout) { // 获取 @vivo-minigame/cli 远程版本号失败
-				console.log("Failed to get the remote version number");
+				console.log("获取 @vivo-minigame/cli 远程版本号失败");
 				resolve();
 				return;
 			}
@@ -110,7 +110,7 @@ gulp.task("createGlobalQGame_VIVO", ["copyPlatformFile_VIVO"], function() {
 		});
 		childProcess.exec("mg -v", { cwd: `${projDir}/node_modules` }, function(error, stdout, stderr) {
 			if (!stdout) { // 获取  @vivo-minigame/cli 本地版本号失败
-				console.log("Failed to get the local version number");
+				console.log("获取 @vivo-minigame/cli 本地版本号失败");
 				resolve();
 				return;
 			}
@@ -124,7 +124,7 @@ gulp.task("createGlobalQGame_VIVO", ["copyPlatformFile_VIVO"], function() {
 		});
 		setTimeout(() => {
 			if (!isGetLocal || !isGetRemote) {
-				console.log("Failed to get the local or remote version number");
+				console.log("获取远程版本号或本地版本号失败");
 				resolve();
 				return;
 			}

@@ -127,7 +127,7 @@ export default class FileTask
             }
         }
 
-        console.log("blockList.length=", blockList.length);
+        // console.log("blockList.length=", blockList.length);
     }
 
     /** 启动 */
@@ -390,13 +390,15 @@ export default class FileTask
         }
 
         
+        let maxRate = 0;
         let onItemProgerss = (rate)=>
         {
             if(len == 1)
             {
                 if(progressHandler)
                 {
-                    progressHandler.runWith(rate);
+                    maxRate = Math.max(rate, maxRate)
+                    progressHandler.runWith(maxRate);
                 }
             }
         }
@@ -416,5 +418,5 @@ window['HRange'] = HRange;
 
 FileTask.MaxBlockNum = 5;
 FileTask.singleTmpFileSize =  1024 * 1024 * 5;
-HRHead.MaxNum = 5;
-HRange.MaxNum = 5;
+HRHead.MaxNum = 2;
+HRange.MaxNum = 3;

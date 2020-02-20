@@ -123,7 +123,7 @@ export default class HRange
         this.xhr.setRequestHeader("content-type", "application/octet-stream");
         
         this.xhr.send();
-        console.log(this.blockInfo, "HRRange.Request");
+        console.log(this.blockInfo, "HRRange.Request", this.block.fileTask.url);
     }
 
     Abort()

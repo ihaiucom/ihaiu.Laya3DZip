@@ -446,13 +446,14 @@
     class HRHead {
         constructor() {
             this.xhr = new XMLHttpRequest();
+            this.xhr.timeout = 3000;
             this.xhr.onreadystatechange = (this.onEvent.bind(this));
         }
         onEvent(e) {
             if (this.xhr.readyState == 4) {
                 if (this.xhr.status == 200) {
                     var fileSize = this.xhr.getResponseHeader('Content-Length');
-                    console.log(fileSize);
+                    console.log("HRHead", fileSize, this.url);
                     this.ResultCallbak(0, parseInt(fileSize));
                 }
                 else {
@@ -477,6 +478,7 @@
             HRHead.RecoverItem(this);
         }
         Request(url, callback, callbackObj) {
+            console.log("HRHead.Request", url);
             this.url = url;
             this.callback = callback;
             this.callbackObj = callbackObj;
@@ -596,7 +598,7 @@
             }
             this.xhr.setRequestHeader("content-type", "application/octet-stream");
             this.xhr.send();
-            console.log(this.blockInfo, "HRRange.Request");
+            console.log(this.blockInfo, "HRRange.Request", this.block.fileTask.url);
         }
         Abort() {
             this.xhr.abort();
@@ -707,7 +709,6 @@
                     blockList.push(block);
                 }
             }
-            console.log("blockList.length=", blockList.length);
         }
         Start(url, responseType = "arraybuffer") {
             this.url = url;
@@ -879,10 +880,12 @@
                     }
                 }
             };
+            let maxRate = 0;
             let onItemProgerss = (rate) => {
                 if (len == 1) {
                     if (progressHandler) {
-                        progressHandler.runWith(rate);
+                        maxRate = Math.max(rate, maxRate);
+                        progressHandler.runWith(maxRate);
                     }
                 }
             };
@@ -901,8 +904,8 @@
     window['HRange'] = HRange;
     FileTask.MaxBlockNum = 5;
     FileTask.singleTmpFileSize = 1024 * 1024 * 5;
-    HRHead.MaxNum = 5;
-    HRange.MaxNum = 5;
+    HRHead.MaxNum = 2;
+    HRange.MaxNum = 3;
 
     class JsZipAsync {
         static loadPath(path, type, callback) {

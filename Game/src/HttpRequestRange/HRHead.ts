@@ -22,7 +22,7 @@ export default class HRHead
             if (this.xhr.status == 200) 
             {
                 var fileSize = this.xhr.getResponseHeader('Content-Length');
-                console.log(fileSize);
+                console.log("HRHead", fileSize, this.url);
                 this.ResultCallbak(0, parseInt(fileSize));
             } 
             else 
@@ -59,6 +59,7 @@ export default class HRHead
 
     Request(url: string, callback: Function, callbackObj?:any)
     {
+        console.log("HRHead.Request", url);
         this.url = url;
         this.callback = callback;
         this.callbackObj = callbackObj;

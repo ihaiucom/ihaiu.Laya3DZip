@@ -42,10 +42,11 @@ export default class FileTask
     RequestSize()
     {
         HRHead.RequestSize(this.url, this.OnGetSize, this);
+        // this.OnGetSize(-1, -1);
     }
 
     /** 获取导文件大小事件 */
-    private OnGetSize(error: number, fileSize: number, url: string)
+    private OnGetSize(error: number, fileSize: number, url?: string)
     {
         
         this.totalSize = fileSize;
@@ -418,5 +419,5 @@ window['HRange'] = HRange;
 
 FileTask.MaxBlockNum = 5;
 FileTask.singleTmpFileSize =  1024 * 1024 * 5;
-HRHead.MaxNum = 2;
-HRange.MaxNum = 3;
+HRHead.MaxNum = 5;
+HRange.MaxNum = 5;

@@ -443,24 +443,144 @@
     }
     FileBlock.pool = [];
 
-    class HRHead {
-        constructor() {
-            this.xhr = new XMLHttpRequest();
-            this.xhr.timeout = 3000;
-            this.xhr.onreadystatechange = (this.onEvent.bind(this));
+    class HttpRequestRangePool {
+        static GetItem() {
+            var num = Laya.loader._loaderCount + HttpRequestHeadPool.useNum + HttpRequestRangePool.useNum;
+            if (num >= 4) {
+                console.log("当前加载数量超过 Range useNum=", HttpRequestRangePool.useNum, "Head useNum=" + HttpRequestHeadPool.useNum, "maxLoader=", Laya.loader.maxLoader, "_loaderCount=", Laya.loader._loaderCount);
+                return null;
+            }
+            if (this.pool.length > 0) {
+                this.useNum++;
+                var item = this.pool.shift();
+                item['__inpool'] = false;
+                return item;
+            }
+            else {
+                this.useNum++;
+                var item = new XMLHttpRequest();
+                item['__inpool'] = false;
+                return item;
+            }
         }
+        static RecoverItem(xhr) {
+            xhr.abort();
+            xhr.onreadystatechange = null;
+            xhr.onprogress = null;
+            xhr.onerror = null;
+            if (xhr['__inpool']) {
+                console.log("HttpRequestPool RecoverItem 多次");
+                return;
+            }
+            this.useNum--;
+            xhr['__inpool'] = true;
+            this.checkWait();
+        }
+        static checkWait() {
+            if (this.wait.length > 0) {
+                var item = this.GetItem();
+                if (item) {
+                    let waitItem = this.wait.shift();
+                    waitItem.runWith(item);
+                }
+                Laya.timer.frameOnce(1, HttpRequestRangePool, this.checkWait, null, true);
+            }
+        }
+        static Request(handler) {
+            let item = this.GetItem();
+            if (item) {
+                handler.runWith(item);
+            }
+            else {
+                this.wait.push(handler);
+                Laya.timer.frameOnce(1, HttpRequestRangePool, this.checkWait, null, true);
+            }
+        }
+    }
+    HttpRequestRangePool.MaxNum = 3;
+    HttpRequestRangePool.pool = [];
+    HttpRequestRangePool.currNum = 0;
+    HttpRequestRangePool.useNum = 0;
+    HttpRequestRangePool.wait = [];
+
+    class HttpRequestHeadPool {
+        static GetItem() {
+            var num = Laya.loader._loaderCount + HttpRequestHeadPool.useNum + HttpRequestRangePool.useNum;
+            if (num >= 4) {
+                console.log("当前加载数量超过 Range useNum=", HttpRequestRangePool.useNum, "Head useNum=" + HttpRequestHeadPool.useNum, "maxLoader=", Laya.loader.maxLoader, "_loaderCount=", Laya.loader._loaderCount);
+                return null;
+            }
+            if (this.pool.length > 0) {
+                this.useNum++;
+                var item = this.pool.shift();
+                item['__inpool'] = false;
+                return item;
+            }
+            else {
+                this.useNum++;
+                var item = new XMLHttpRequest();
+                item['__inpool'] = false;
+                return item;
+            }
+        }
+        static RecoverItem(xhr) {
+            xhr.abort();
+            xhr.onreadystatechange = null;
+            xhr.onprogress = null;
+            xhr.onerror = null;
+            if (xhr['__inpool']) {
+                console.log("HttpRequestPool RecoverItem 多次");
+                return;
+            }
+            this.useNum--;
+            xhr['__inpool'] = true;
+            this.checkWait();
+        }
+        static checkWait() {
+            if (this.wait.length > 0) {
+                var item = this.GetItem();
+                if (item) {
+                    let waitItem = this.wait.shift();
+                    waitItem.runWith(item);
+                }
+                Laya.timer.frameOnce(1, HttpRequestHeadPool, this.checkWait, null, true);
+            }
+        }
+        static Request(handler) {
+            let item = this.GetItem();
+            if (item) {
+                handler.runWith(item);
+            }
+            else {
+                this.wait.push(handler);
+                Laya.timer.frameOnce(1, HttpRequestHeadPool, this.checkWait, null, true);
+            }
+        }
+    }
+    HttpRequestHeadPool.MaxNum = 2;
+    HttpRequestHeadPool.pool = [];
+    HttpRequestHeadPool.currNum = 0;
+    HttpRequestHeadPool.useNum = 0;
+    HttpRequestHeadPool.wait = [];
+
+    var Handler$1 = Laya.Handler;
+    class HRHead {
         onEvent(e) {
             if (this.xhr.readyState == 4) {
-                if (this.xhr.status == 200) {
-                    var fileSize = this.xhr.getResponseHeader('Content-Length');
+                console.log(this.xhr.readyState, this.xhr.status, this.xhr.getResponseHeader('Content-Length'));
+                var fileSize = this.xhr.getResponseHeader('Content-Length');
+                if (fileSize) {
                     console.log("HRHead", fileSize, this.url);
                     this.ResultCallbak(0, parseInt(fileSize));
                 }
                 else {
-                    console.log("HRHead 请求文件头失败", this.url);
-                    this.ResultCallbak(1, -1);
+                    console.error("HRHead 请求文件头失败", this.url);
                 }
             }
+        }
+        onerror(e) {
+            console.warn("HRHead 请求文件头失败", this.url, e);
+            this.ResultCallbak(1, -1);
         }
         ResultCallbak(errorCode, fileSize) {
             if (this.callback) {
@@ -473,17 +593,26 @@
             }
             this.callback = null;
             this.callbackObj = null;
-            this.xhr.abort();
             this.url = null;
-            HRHead.RecoverItem(this);
+            if (this.xhr) {
+                this.xhr.abort();
+                HttpRequestHeadPool.RecoverItem(this.xhr);
+                this.xhr = null;
+                HRHead.RecoverItem(this);
+            }
         }
         Request(url, callback, callbackObj) {
             console.log("HRHead.Request", url);
             this.url = url;
             this.callback = callback;
             this.callbackObj = callbackObj;
-            this.xhr.open('HEAD', url, true);
-            this.xhr.send();
+            HttpRequestHeadPool.Request(Handler$1.create(this, (xhr) => {
+                this.xhr = xhr;
+                this.xhr.onreadystatechange = (this.onEvent.bind(this));
+                this.xhr.onerror = (this.onerror.bind(this));
+                this.xhr.open('HEAD', url, true);
+                this.xhr.send();
+            }));
         }
         static GetItem() {
             if (this.pool.length > 0) {
@@ -525,14 +654,8 @@
     HRHead.pool = [];
     HRHead.wait = [];
 
+    var Handler$2 = Laya.Handler;
     class HRange {
-        constructor() {
-            this.xhr = new XMLHttpRequest();
-            this.xhr.onreadystatechange = (this.onreadystatechange.bind(this));
-            this.xhr.onprogress = (this.onprogress.bind(this));
-            this.xhr.onerror = (this.onerror.bind(this));
-            window['xhr'] = this;
-        }
         get blockInfo() {
             return "block_" + this.block.index + ", sendIndex=" + this.block.sendIndex;
         }
@@ -563,18 +686,19 @@
             this.OnEnd(true);
         }
         onerror(e) {
-            console.error(this.blockInfo, e, this.block.fileTask.url);
-            Laya.timer.frameOnce(10, this, this.Request, [this.block, true]);
+            console.warn(this.blockInfo, e, this.block.fileTask.url);
+            Laya.timer.frameOnce(10, this, this.Send, [true]);
         }
         OnEnd(isAbort) {
             this.block.OnEnd(isAbort);
             this.block = null;
-            if (!isAbort) {
-                this.xhr.abort();
-            }
+            this.xhr.abort();
+            HttpRequestRangePool.RecoverItem(this.xhr);
+            this.xhr = null;
             HRange.RecoverItem(this);
         }
-        Request(block, isError) {
+        Send(isError) {
+            var block = this.block;
             if (isError) {
                 if (!block.responseList[block.sendIndex]) {
                     block.progressList[block.sendIndex] = 0;
@@ -583,14 +707,10 @@
                     block.sendIndex++;
                 }
             }
-            else {
-                block.sendIndex++;
-            }
-            this.block = block;
             this.xhr.abort();
             this.xhr.responseType = block.fileTask.responseType;
             this.xhr.open("get", block.fileTask.url, true);
-            if (block.end <= 0) {
+            if (this.block.end <= 0) {
                 this.xhr.setRequestHeader("Range", `bytes=0- `);
             }
             else {
@@ -598,7 +718,18 @@
             }
             this.xhr.setRequestHeader("content-type", "application/octet-stream");
             this.xhr.send();
-            console.log(this.blockInfo, "HRRange.Request", this.block.fileTask.url);
+            console.log(this.blockInfo, "HRRange.Send", this.block.fileTask.url);
+        }
+        Request(block, isError) {
+            block.sendIndex++;
+            this.block = block;
+            HttpRequestRangePool.Request(Handler$2.create(this, (xhr) => {
+                this.xhr = xhr;
+                this.xhr.onreadystatechange = (this.onreadystatechange.bind(this));
+                this.xhr.onprogress = (this.onprogress.bind(this));
+                this.xhr.onerror = (this.onerror.bind(this));
+                this.Send();
+            }));
         }
         Abort() {
             this.xhr.abort();
@@ -904,8 +1035,8 @@
     window['HRange'] = HRange;
     FileTask.MaxBlockNum = 5;
     FileTask.singleTmpFileSize = 1024 * 1024 * 5;
-    HRHead.MaxNum = 2;
-    HRange.MaxNum = 3;
+    HRHead.MaxNum = 5;
+    HRange.MaxNum = 5;
 
     class JsZipAsync {
         static loadPath(path, type, callback) {
@@ -1167,7 +1298,7 @@
     }
     WaitCallbackList.map = new Map();
 
-    var Handler$1 = Laya.Handler;
+    var Handler$3 = Laya.Handler;
     class ZipManager {
         constructor() {
             this.zipExt = ".zip";
@@ -1368,7 +1499,7 @@
             else {
                 WaitCallbackList.Add(zipPath, callback);
                 if (WaitCallbackList.Get(zipPath).list.length == 1) {
-                    JsZipAsync.loadPath(zipPath, Laya.Loader.BUFFER, Handler$1.create(this, (zip) => {
+                    JsZipAsync.loadPath(zipPath, Laya.Loader.BUFFER, Handler$3.create(this, (zip) => {
                         if (zip) {
                             this.zipMap.set(zipPath, zip);
                         }
@@ -1416,7 +1547,7 @@
             else {
                 WaitCallbackList.Add(url, callback);
                 if (WaitCallbackList.Get(url).list.length == 1) {
-                    this.LoadAssetData(assetPath, Handler$1.create(this, (data) => {
+                    this.LoadAssetData(assetPath, Handler$3.create(this, (data) => {
                         var assetReferenceCount = this.GetAssetReference(assetPath);
                         if (assetReferenceCount > 0) {
                             console.error("ZipManager.GetAssetDataAsync 已经存在创建的资源了", assetPath, assetReferenceCount);
@@ -1432,13 +1563,13 @@
             let assetName = this.manifest.GetAssetNameByPath(assetPath);
             let zipPath = this.manifest.GetAssetZipPath(assetName);
             let type = this.manifest.GetEnumZipAssetDataType(assetName);
-            this.GetZip(zipPath, Handler$1.create(this, (zip) => {
+            this.GetZip(zipPath, Handler$3.create(this, (zip) => {
                 if (!zip) {
                     console.log("没有Zip", zipPath, assetPath);
                     callback.runWith(null);
                     return;
                 }
-                JsZipAsync.read(zip, assetName, type, Handler$1.create(this, (data) => {
+                JsZipAsync.read(zip, assetName, type, Handler$3.create(this, (data) => {
                     if (data == null) {
                         console.log("zip读取资源失败", zipPath, assetPath);
                         callback.runWith(null);
@@ -1490,7 +1621,7 @@
                         continue;
                     }
                     else {
-                        JsZipAsync.loadPath(zipPath, Laya.Loader.BUFFER, Handler$1.create(this, (zip) => {
+                        JsZipAsync.loadPath(zipPath, Laya.Loader.BUFFER, Handler$3.create(this, (zip) => {
                             this.zipMap.set(zipPath, zip);
                             loadNum++;
                             progerssFun(loadNum, loadTotal, zipPath);
@@ -1563,7 +1694,7 @@
                         let assetName = assetNameList[j];
                         let assetPath = this.AssetNameToPath(assetName);
                         let type = this.manifest.GetEnumZipAssetDataType(assetName);
-                        JsZipAsync.read(zip, assetName, type, Handler$1.create(this, (data) => {
+                        JsZipAsync.read(zip, assetName, type, Handler$3.create(this, (data) => {
                             assetNameLoadedCount++;
                             if (data) {
                                 switch (type) {
@@ -1593,14 +1724,14 @@
         }
         async GetZipAsync(zipPath) {
             return new Promise((resolve) => {
-                this.GetZip(zipPath, Handler$1.create(this, (zip) => {
+                this.GetZip(zipPath, Handler$3.create(this, (zip) => {
                     resolve(zip);
                 }));
             });
         }
         async GetOrLoadAssetDataAsync(url) {
             return new Promise((resolve) => {
-                this.GetOrLoadAssetData(url, Handler$1.create(this, (data) => {
+                this.GetOrLoadAssetData(url, Handler$3.create(this, (data) => {
                     resolve(data);
                 }));
             });
@@ -1917,7 +2048,7 @@
     DebugResources.laya3dEndNumMap = new Map();
     window['DebugResources'] = DebugResources;
 
-    var Handler$2 = Laya.Handler;
+    var Handler$4 = Laya.Handler;
     class PreloadZipList {
         constructor(zipPathList, assetPathList) {
             this.assetPathList = [];
@@ -1952,28 +2083,28 @@
                 return;
             }
             let time = Laya.timer.currTimer;
-            this.LoadList(Handler$2.create(this, () => {
+            this.LoadList(Handler$4.create(this, () => {
                 console.log("加载Zip完成", Laya.timer.currTimer - time);
                 let time2 = Laya.timer.currTimer;
-                this.LoadZipList(Handler$2.create(this, () => {
+                this.LoadZipList(Handler$4.create(this, () => {
                     console.log("装载Zip完成", Laya.timer.currTimer - time2);
                     let time3 = Laya.timer.currTimer;
-                    this.UnzipList(Handler$2.create(this, () => {
+                    this.UnzipList(Handler$4.create(this, () => {
                         console.log("解压zip完成", Laya.timer.currTimer - time3);
                         console.log("加载总费时", Laya.timer.currTimer - time);
                         if (progressHandler)
                             progressHandler.recover();
                         if (completeHandler)
                             completeHandler.run();
-                    }), Handler$2.create(this, (progress) => {
+                    }), Handler$4.create(this, (progress) => {
                         if (progressHandler)
                             progressHandler.runWith(progress * 0.3 + 0.7);
                     }, null, false));
-                }), Handler$2.create(this, (progress) => {
+                }), Handler$4.create(this, (progress) => {
                     if (progressHandler)
                         progressHandler.runWith(progress * 0.2 + 0.5);
                 }, null, false));
-            }), Handler$2.create(this, (progress) => {
+            }), Handler$4.create(this, (progress) => {
                 if (progressHandler)
                     progressHandler.runWith(progress * 0.5);
             }, null, false));
@@ -1987,7 +2118,7 @@
                     completeHandler.run();
                 return;
             }
-            this.LoadList2(Handler$2.create(this, (result) => {
+            this.LoadList2(Handler$4.create(this, (result) => {
                 if (result == false) {
                     Laya.timer.frameOnce(30, this, () => {
                         this.LoadList(completeHandler);
@@ -2015,7 +2146,7 @@
             var index = 0;
             var len = this.zipPathList.length;
             for (var i = 0; i < len; i++) {
-                ZipManager.Instance.GetZip(this.zipPathList[this.loadZipIndex], Handler$2.create(this, () => {
+                ZipManager.Instance.GetZip(this.zipPathList[this.loadZipIndex], Handler$4.create(this, () => {
                     index++;
                     if (progressHandler)
                         progressHandler.runWith(index / this.total);
@@ -2030,7 +2161,7 @@
         }
         LoadZipOnce(completeHandler, progressHandler) {
             for (let i = 0; i < this.loadZipOnceNum; i++) {
-                ZipManager.Instance.GetZip(this.zipPathList[this.loadZipIndex], Handler$2.create(this, () => {
+                ZipManager.Instance.GetZip(this.zipPathList[this.loadZipIndex], Handler$4.create(this, () => {
                     this.loadedZipIndex++;
                     if (progressHandler)
                         progressHandler.runWith(this.loadedZipIndex / this.total);
@@ -2061,7 +2192,7 @@
             }
             for (let i = 0; i < len; i++) {
                 let assetPath = this.assetPathList[i];
-                ZipManager.Instance.GetOrLoadAssetData(assetPath, Handler$2.create(this, () => {
+                ZipManager.Instance.GetOrLoadAssetData(assetPath, Handler$4.create(this, () => {
                     index++;
                     if (progressHandler)
                         progressHandler.runWith(index / len);
@@ -2209,7 +2340,7 @@
         }
     }
 
-    var Handler$3 = Laya.Handler;
+    var Handler$5 = Laya.Handler;
     class PrefabManager {
         static get Instance() {
             if (!PrefabManager._Instance) {
@@ -2307,14 +2438,14 @@
             let zipPathList = manifest.GetAssetListDependencieZipPathList(assetNameList);
             this.preloadZip = new PreloadZipList(zipPathList, assetPathList);
             this.preloadAsset = new PreloadAssetList(prefabAssetPathList);
-            this.preloadZip.Start(Handler$3.create(this, () => {
+            this.preloadZip.Start(Handler$5.create(this, () => {
                 if (isLoadPrefab) {
-                    this.preloadAsset.LoadList(Handler$3.create(this, () => {
+                    this.preloadAsset.LoadList(Handler$5.create(this, () => {
                         if (progressHandler)
                             progressHandler.recover();
                         if (completeHandler)
                             completeHandler.run();
-                    }), Handler$3.create(this, (progress) => {
+                    }), Handler$5.create(this, (progress) => {
                         if (progressHandler)
                             progressHandler.runWith(progress * 0.3 + 0.7);
                     }, null, false));
@@ -2325,7 +2456,7 @@
                     if (completeHandler)
                         completeHandler.run();
                 }
-            }), Handler$3.create(this, (progress) => {
+            }), Handler$5.create(this, (progress) => {
                 if (isLoadPrefab) {
                     if (progressHandler)
                         progressHandler.runWith(progress * 0.7);
@@ -2338,7 +2469,7 @@
         }
         async PreloadPrefabListAsync(resIdList, isLoadPrefab = true, progressHandler) {
             return new Promise((resolve) => {
-                this.LoadPrefabList(resIdList, isLoadPrefab, Handler$3.create(this, () => {
+                this.LoadPrefabList(resIdList, isLoadPrefab, Handler$5.create(this, () => {
                     resolve();
                 }), progressHandler);
             });

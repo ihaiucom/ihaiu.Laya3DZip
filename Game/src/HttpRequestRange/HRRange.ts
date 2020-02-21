@@ -1,4 +1,6 @@
 import FileBlock from "./FileBlock";
+import Handler = Laya.Handler;
+import HttpRequestRangePool from "./HttpRequestRangePool";
 
 export default class HRange
 {
@@ -10,14 +12,13 @@ export default class HRange
         return "block_" + this.block.index + ", sendIndex=" + this.block.sendIndex;
     }
 
-    constructor()
-    {
-        this.xhr = new XMLHttpRequest();
-        this.xhr.onreadystatechange = (this.onreadystatechange.bind(this));
-        this.xhr.onprogress = (this.onprogress.bind(this));
-        this.xhr.onerror = (this.onerror.bind(this));
-        window['xhr'] = this;
-    }
+    // constructor()
+    // {
+    //     this.xhr = new XMLHttpRequest();
+    //     this.xhr.onreadystatechange = (this.onreadystatechange.bind(this));
+    //     this.xhr.onprogress = (this.onprogress.bind(this));
+    //     this.xhr.onerror = (this.onerror.bind(this));
+    // }
     
     private onreadystatechange(e)
     {
@@ -73,9 +74,9 @@ export default class HRange
 
     private onerror(e)
     {
-        console.error(this.blockInfo, e, this.block.fileTask.url);
+        console.warn(this.blockInfo, e, this.block.fileTask.url);
         // 加载错误就尝试重新加载
-        Laya.timer.frameOnce(10, this, this.Request, [this.block, true]);
+        Laya.timer.frameOnce(10, this, this.Send, [true]);
         // this.Request(this.block, true);
     }
 
@@ -83,15 +84,16 @@ export default class HRange
     {
         this.block.OnEnd(isAbort);
         this.block = null;
-        if(!isAbort)
-        {
-            this.xhr.abort();
-        }
+        this.xhr.abort();
+        HttpRequestRangePool.RecoverItem(this.xhr);
+        this.xhr = null;
+
         HRange.RecoverItem(this);
     }
 
-    Request(block:FileBlock, isError?: boolean)
+    private Send(isError?: boolean)
     {
+        var block = this.block;
         if(isError)
         {
             if(!block.responseList[block.sendIndex])
@@ -102,16 +104,12 @@ export default class HRange
             {
                 block.sendIndex ++;
             }
+            
         }
-        else
-        {
-            block.sendIndex ++;
-        }
-        this.block = block;
         this.xhr.abort();
         this.xhr.responseType = block.fileTask.responseType;
         this.xhr.open("get", block.fileTask.url, true);
-        if(block.end <= 0)
+        if(this.block.end <= 0)
         {
             this.xhr.setRequestHeader("Range",`bytes=0- `);
         }
@@ -123,7 +121,21 @@ export default class HRange
         this.xhr.setRequestHeader("content-type", "application/octet-stream");
         
         this.xhr.send();
-        console.log(this.blockInfo, "HRRange.Request", this.block.fileTask.url);
+        console.log(this.blockInfo, "HRRange.Send", this.block.fileTask.url);
+    }
+
+    Request(block:FileBlock, isError?: boolean)
+    {
+        block.sendIndex ++;
+        this.block = block;
+        HttpRequestRangePool.Request(Handler.create(this, (xhr: XMLHttpRequest)=>{
+            this.xhr = xhr;
+            this.xhr.onreadystatechange = (this.onreadystatechange.bind(this));
+            this.xhr.onprogress = (this.onprogress.bind(this));
+            this.xhr.onerror = (this.onerror.bind(this));
+            this.Send();
+        }))
+
     }
 
     Abort()

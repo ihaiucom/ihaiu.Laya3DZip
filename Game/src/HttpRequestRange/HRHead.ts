@@ -1,3 +1,6 @@
+
+import Handler = Laya.Handler;
+import HttpRequestHeadPool from "./HttpRequestHeadPool";
 /** Http Request Head */
 export default class HRHead
 {
@@ -7,11 +10,11 @@ export default class HRHead
     callback: Function;
     callbackObj:any;
 
-    constructor()
-    {
-        this.xhr = new XMLHttpRequest();
-        this.xhr.onreadystatechange = (this.onEvent.bind(this));
-    }
+    // constructor()
+    // {
+    //     this.xhr = new XMLHttpRequest();
+    //     this.xhr.onreadystatechange = (this.onEvent.bind(this));
+    // }
 
     private onEvent(e)
     {
@@ -19,18 +22,25 @@ export default class HRHead
         // console.log(this.xhr.readyState, this.xhr.status);
         if (this.xhr.readyState == 4) 
         {
-            if (this.xhr.status == 200) 
+            console.log(this.xhr.readyState, this.xhr.status, this.xhr.getResponseHeader('Content-Length'));
+            var fileSize = this.xhr.getResponseHeader('Content-Length');
+            if (fileSize) 
             {
-                var fileSize = this.xhr.getResponseHeader('Content-Length');
                 console.log("HRHead", fileSize, this.url);
                 this.ResultCallbak(0, parseInt(fileSize));
             } 
             else 
             {
-                console.log("HRHead 请求文件头失败", this.url);
-                this.ResultCallbak(1, -1);
+                console.error("HRHead 请求文件头失败", this.url);
+                // this.ResultCallbak(1, -1);
             }
         }
+    }
+
+    private onerror(e)
+    {
+        console.warn("HRHead 请求文件头失败", this.url, e);
+        this.ResultCallbak(1, -1);
     }
 
     private ResultCallbak(errorCode: number, fileSize: number)
@@ -49,9 +59,15 @@ export default class HRHead
 
         this.callback = null;
         this.callbackObj = null;
-        this.xhr.abort();
         this.url = null;
-        HRHead.RecoverItem(this);
+        if(this.xhr)
+        {
+            this.xhr.abort();
+        
+            HttpRequestHeadPool.RecoverItem(this.xhr);
+            this.xhr = null;
+            HRHead.RecoverItem(this);
+        }
 
     }
 
@@ -63,8 +79,14 @@ export default class HRHead
         this.url = url;
         this.callback = callback;
         this.callbackObj = callbackObj;
-        this.xhr.open('HEAD', url, true);
-        this.xhr.send()
+        HttpRequestHeadPool.Request(Handler.create(this, (xhr: XMLHttpRequest)=>
+        {
+            this.xhr = xhr;
+            this.xhr.onreadystatechange = (this.onEvent.bind(this));
+            this.xhr.onerror = (this.onerror.bind(this));
+            this.xhr.open('HEAD', url, true);
+            this.xhr.send()
+        }))
     }
 
 

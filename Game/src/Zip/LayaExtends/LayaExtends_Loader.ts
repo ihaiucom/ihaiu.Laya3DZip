@@ -179,7 +179,14 @@ export default class LayaExtends_Loader
 
     private async _loadHtmlImage(url:string, onLoadCaller, onLoad, onErrorCaller, onError) 
     {
+        if(url.indexOf("Conventional/res3d/Conventional") != -1)
+        {
+            console.error("_addHierarchyInnerUrls path=", url);
+        }
         
+        if (url.indexOf("Langyabing/res3d/Conventional") != -1) {
+            console.error("Langyabing/res3d/Conventional path=", url);
+        }
         ZipManager.Instance.GetOrLoadAssetData(url, Handler.create(this, (data)=>{
             if(data)
             {

@@ -358,6 +358,9 @@
         src_loadHtmlImage(url, onLoadCaller, onLoad, onErrorCaller, onError) {
         }
         async _loadHtmlImage(url, onLoadCaller, onLoad, onErrorCaller, onError) {
+            if (url.indexOf("Conventional/res3d/Conventional") != -1) {
+                console.error("_addHierarchyInnerUrls path=", url);
+            }
             ZipManager.Instance.GetOrLoadAssetData(url, Handler.create(this, (data) => {
                 if (data) {
                     Laya.timer.frameOnce(1, this, () => {
@@ -447,7 +450,6 @@
         static GetItem() {
             var num = Laya.loader._loaderCount + HttpRequestHeadPool.useNum + HttpRequestRangePool.useNum;
             if (num >= 4) {
-                console.log("当前加载数量超过 Range useNum=", HttpRequestRangePool.useNum, "Head useNum=" + HttpRequestHeadPool.useNum, "maxLoader=", Laya.loader.maxLoader, "_loaderCount=", Laya.loader._loaderCount);
                 return null;
             }
             if (this.pool.length > 0) {
@@ -507,7 +509,6 @@
         static GetItem() {
             var num = Laya.loader._loaderCount + HttpRequestHeadPool.useNum + HttpRequestRangePool.useNum;
             if (num >= 4) {
-                console.log("当前加载数量超过 Range useNum=", HttpRequestRangePool.useNum, "Head useNum=" + HttpRequestHeadPool.useNum, "maxLoader=", Laya.loader.maxLoader, "_loaderCount=", Laya.loader._loaderCount);
                 return null;
             }
             if (this.pool.length > 0) {
@@ -567,14 +568,12 @@
     class HRHead {
         onEvent(e) {
             if (this.xhr.readyState == 4) {
-                console.log(this.xhr.readyState, this.xhr.status, this.xhr.getResponseHeader('Content-Length'));
                 var fileSize = this.xhr.getResponseHeader('Content-Length');
                 if (fileSize) {
-                    console.log("HRHead", fileSize, this.url);
                     this.ResultCallbak(0, parseInt(fileSize));
                 }
                 else {
-                    console.error("HRHead 请求文件头失败", this.url);
+                    this.ResultCallbak(1, -1);
                 }
             }
         }
@@ -718,7 +717,6 @@
             }
             this.xhr.setRequestHeader("content-type", "application/octet-stream");
             this.xhr.send();
-            console.log(this.blockInfo, "HRRange.Send", this.block.fileTask.url);
         }
         Request(block, isError) {
             block.sendIndex++;
@@ -2394,12 +2392,8 @@
             this.preloadZip = null;
             this.preloadAsset = null;
         }
-        LoadPrefabList(resIdList, isLoadPrefab = true, completeHandler, progressHandler) {
+        LoadPrefabList2(resIdList, isLoadPrefab = true, completeHandler, progressHandler) {
             this.StopPreload();
-            if (!ZipManager.enable) {
-                this.PreloadPrefabList2(resIdList);
-                return;
-            }
             let len = resIdList.length;
             if (len == 0) {
                 if (completeHandler)
@@ -2467,23 +2461,78 @@
                 }
             }, null, false));
         }
-        async PreloadPrefabListAsync(resIdList, isLoadPrefab = true, progressHandler) {
-            return new Promise((resolve) => {
-                this.LoadPrefabList(resIdList, isLoadPrefab, Handler$5.create(this, () => {
-                    resolve();
-                }), progressHandler);
-            });
-        }
-        async PreloadPrefabList2(resIdList) {
-            let assetPathList = [];
-            for (let resId of resIdList) {
-                let assetPath = this.ResFileNameToAssetPath(resId);
+        LoadPrefabList(pathList, prefabAssetPathList, isLoadPrefab = true, completeHandler, progressHandler) {
+            this.StopPreload();
+            let len = pathList.length;
+            if (len == 0) {
+                if (completeHandler)
+                    completeHandler.run();
+                return;
+            }
+            var manifest = ZipManager.Instance.manifest;
+            var assetPathList = [];
+            var tmpMap = new Map();
+            for (let assetPath of pathList) {
+                tmpMap.set(assetPath, true);
                 assetPathList.push(assetPath);
             }
-            this.preloadAsset = new PreloadAssetList(assetPathList);
-            if (this.preloadAsset) {
-                await this.preloadAsset.StartAsync();
+            for (let assetPath of pathList) {
+                let item = Laya.Loader.getRes(assetPath);
+                if (item) {
+                    continue;
+                }
+                if (!manifest.HasAssetByPath(assetPath)) {
+                    console.warn("Zip 文件清单中不存在资源", assetPath);
+                    continue;
+                }
+                let dependencieAssetPathList = manifest.GetAssetDependenciePathListByAssetPath(assetPath);
+                if (!dependencieAssetPathList) {
+                    continue;
+                }
+                for (let dependencieAssetPath of dependencieAssetPathList) {
+                    if (tmpMap.has(dependencieAssetPath)) {
+                        continue;
+                    }
+                    let item = Laya.Loader.getRes(dependencieAssetPath);
+                    if (item) {
+                        continue;
+                    }
+                    assetPathList.push(dependencieAssetPath);
+                    tmpMap.set(dependencieAssetPath, true);
+                }
             }
+            let assetNameList = ZipManager.Instance.AssetPathListToAssetNameList(prefabAssetPathList);
+            let zipPathList = manifest.GetAssetListDependencieZipPathList(assetNameList);
+            this.preloadZip = new PreloadZipList(zipPathList, assetPathList);
+            this.preloadAsset = new PreloadAssetList(prefabAssetPathList);
+            this.preloadZip.Start(Handler$5.create(this, () => {
+                if (isLoadPrefab) {
+                    this.preloadAsset.LoadList(Handler$5.create(this, () => {
+                        if (progressHandler)
+                            progressHandler.recover();
+                        if (completeHandler)
+                            completeHandler.run();
+                    }), Handler$5.create(this, (progress) => {
+                        if (progressHandler)
+                            progressHandler.runWith(progress * 0.3 + 0.7);
+                    }, null, false));
+                }
+                else {
+                    if (progressHandler)
+                        progressHandler.recover();
+                    if (completeHandler)
+                        completeHandler.run();
+                }
+            }), Handler$5.create(this, (progress) => {
+                if (isLoadPrefab) {
+                    if (progressHandler)
+                        progressHandler.runWith(progress * 0.7);
+                }
+                else {
+                    if (progressHandler)
+                        progressHandler.runWith(progress);
+                }
+            }, null, false));
         }
     }
     window['PrefabManager'] = PrefabManager;

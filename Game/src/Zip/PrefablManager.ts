@@ -100,14 +100,9 @@ export default class PrefabManager
 
     
     /** 隐藏默默加载 */
-    public LoadPrefabList(resIdList:string[], isLoadPrefab: boolean = true, completeHandler?: Handler, progressHandler?: Handler)
+    public LoadPrefabList2(resIdList:string[], isLoadPrefab: boolean = true, completeHandler?: Handler, progressHandler?: Handler)
     {
         this.StopPreload();
-        if(!ZipManager.enable)
-        {
-            this.PreloadPrefabList2(resIdList);
-            return;
-        }
 
         let i = 0;
         let len = resIdList.length;
@@ -209,34 +204,120 @@ export default class PrefabManager
        
     }
 
+    
     /** 隐藏默默加载 */
-    public async PreloadPrefabListAsync(resIdList:string[], isLoadPrefab: boolean = true, progressHandler?: Handler)
+    public LoadPrefabList(pathList:string[], prefabAssetPathList: string[], isLoadPrefab: boolean = true, completeHandler?: Handler, progressHandler?: Handler)
     {
-        return new Promise((resolve)=>{
-            this.LoadPrefabList(resIdList, isLoadPrefab, Handler.create(this, ()=>
+        this.StopPreload();
+
+        let i = 0;
+        let len = pathList.length;
+        if(len == 0)
+        {
+            if(completeHandler) completeHandler.run();
+            return;
+        }
+
+        var manifest:AssetManifest = ZipManager.Instance.manifest;
+        var assetPathList:string[] = [];
+        var tmpMap:Map<string, any> = new Map<string, any>();
+        
+        for(let assetPath of pathList)
+        {
+            tmpMap.set(assetPath, true);
+            assetPathList.push(assetPath);
+        }
+
+        for(let assetPath of pathList)
+        {
+            let item  = Laya.Loader.getRes(assetPath);
+            if(item)
             {
-                resolve();
+                continue;
+            }
+
+            if(!manifest.HasAssetByPath(assetPath))
+            {
+                console.warn("Zip 文件清单中不存在资源", assetPath);
+                continue;
+            }
+
+
+            let dependencieAssetPathList:string[] = manifest.GetAssetDependenciePathListByAssetPath(assetPath);
+            if(!dependencieAssetPathList)
+            {
+                // console.log("Zip 没有依赖: ", assetPath);
+                continue;
+            }
+            for(let dependencieAssetPath of dependencieAssetPathList)
+            {
+                if(tmpMap.has(dependencieAssetPath))
+                {
+                    continue;
+                }
+                
+                let item  = Laya.Loader.getRes(dependencieAssetPath);
+                if(item)
+                {
+                    continue;
+                }
+
+
+                assetPathList.push(dependencieAssetPath);
+                tmpMap.set(dependencieAssetPath, true);
+            }
+        }
+        
+        let assetNameList:string[] = ZipManager.Instance.AssetPathListToAssetNameList(prefabAssetPathList);
+        let zipPathList = manifest.GetAssetListDependencieZipPathList(assetNameList);
+
+        this.preloadZip = new PreloadZipList(zipPathList, assetPathList);
+        this.preloadAsset = new PreloadAssetList(prefabAssetPathList);
+
+        this.preloadZip.Start(
+            Handler.create(this, ()=>{
+                if(isLoadPrefab)
+                {
+                    this.preloadAsset.LoadList(
+                        
+                        Handler.create(this, ()=>{
+                            if(progressHandler) progressHandler.recover();
+                            if(completeHandler) completeHandler.run();
+                        }),
+
+                        // 加载prefab进度
+                        Handler.create(this, (progress)=>{
+                            if(progressHandler) progressHandler.runWith(progress * 0.3 + 0.7);
+                        }, null, false)
+                    );
+                }
+                else
+                {
+                    if(progressHandler) progressHandler.recover();
+                    if(completeHandler) completeHandler.run();
+                }
             }),
-            progressHandler)
-        });
+            // 加载Zip进度
+            Handler.create(this, (progress)=>{
+                if(isLoadPrefab)
+                {
+                    if(progressHandler) progressHandler.runWith(progress * 0.7);
+                }
+                else
+                {
+                    if(progressHandler) progressHandler.runWith(progress);
+                }
+            }, null, false),
+        );
+
+        // await this.preloadZip.StartAsync();
+        // if(this.preloadAsset)
+        // {
+        //     await this.preloadAsset.StartAsync();
+        // }
        
     }
 
-    private async PreloadPrefabList2(resIdList:string[])
-    {
-        let assetPathList:string[] = [];
-        for(let resId of resIdList)
-        {
-            let assetPath = this.ResFileNameToAssetPath(resId);
-            assetPathList.push(assetPath);
-        }
-        this.preloadAsset = new PreloadAssetList(assetPathList);
-
-        if(this.preloadAsset)
-        {
-            await this.preloadAsset.StartAsync();
-        }
-    }
 }
 
 window['PrefabManager'] = PrefabManager;

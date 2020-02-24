@@ -22,17 +22,17 @@ export default class HRHead
         // console.log(this.xhr.readyState, this.xhr.status);
         if (this.xhr.readyState == 4) 
         {
-            console.log(this.xhr.readyState, this.xhr.status, this.xhr.getResponseHeader('Content-Length'));
+            // console.log(this.xhr.readyState, this.xhr.status, this.xhr.getResponseHeader('Content-Length'));
             var fileSize = this.xhr.getResponseHeader('Content-Length');
             if (fileSize) 
             {
-                console.log("HRHead", fileSize, this.url);
+                // console.log("HRHead", fileSize, this.url);
                 this.ResultCallbak(0, parseInt(fileSize));
             } 
             else 
             {
-                console.error("HRHead 请求文件头失败", this.url);
-                // this.ResultCallbak(1, -1);
+                // console.warn("HRHead 请求文件头失败", this.url);
+                this.ResultCallbak(1, -1);
             }
         }
     }

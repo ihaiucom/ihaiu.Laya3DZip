@@ -12,7 +12,7 @@ export default class HttpRequestRangePool
         var num = Laya.loader._loaderCount + HttpRequestHeadPool.useNum + HttpRequestRangePool.useNum;
         if(num >= 4)
         {
-            console.log("当前加载数量超过 Range useNum=", HttpRequestRangePool.useNum, "Head useNum=" + HttpRequestHeadPool.useNum, "maxLoader=", Laya.loader.maxLoader, "_loaderCount=",Laya.loader._loaderCount );
+            // console.log("当前加载数量超过 Range useNum=", HttpRequestRangePool.useNum, "Head useNum=" + HttpRequestHeadPool.useNum, "maxLoader=", Laya.loader.maxLoader, "_loaderCount=",Laya.loader._loaderCount );
             return null;
         }
         

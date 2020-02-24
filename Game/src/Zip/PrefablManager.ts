@@ -99,110 +99,6 @@ export default class PrefabManager
     }
 
     
-    /** 隐藏默默加载 */
-    public LoadPrefabList2(resIdList:string[], isLoadPrefab: boolean = true, completeHandler?: Handler, progressHandler?: Handler)
-    {
-        this.StopPreload();
-
-        let i = 0;
-        let len = resIdList.length;
-        if(len == 0)
-        {
-            if(completeHandler) completeHandler.run();
-            return;
-        }
-
-        var manifest:AssetManifest = ZipManager.Instance.manifest;
-        let prefabAssetPathList:string[] = [];
-        let assetPathList:string[] = [];
-        var tmpMap:Map<string, any> = new Map<string, any>();
-        for(let resId of resIdList)
-        {
-            let assetPath = this.ResFileNameToAssetPath(resId);
-            let item  = Laya.Loader.getRes(assetPath);
-            if(item)
-            {
-                continue;
-            }
-
-            if(!manifest.HasAssetByPath(assetPath))
-            {
-                console.warn("Zip 文件清单中不存在资源", assetPath);
-                continue;
-            }
-
-
-            let dependencieAssetPathList:string[] = manifest.GetAssetDependenciePathListByAssetPath(assetPath);
-            for(let dependencieAssetPath of dependencieAssetPathList)
-            {
-                if(tmpMap.has(dependencieAssetPath))
-                {
-                    continue;
-                }
-                
-                let item  = Laya.Loader.getRes(dependencieAssetPath);
-                if(item)
-                {
-                    continue;
-                }
-
-
-                assetPathList.push(dependencieAssetPath);
-                tmpMap.set(dependencieAssetPath, true);
-            }
-            // assetPathList.push(assetPath);
-            prefabAssetPathList.push(assetPath);
-        }
-        
-        let assetNameList:string[] = ZipManager.Instance.AssetPathListToAssetNameList(prefabAssetPathList);
-        let zipPathList = manifest.GetAssetListDependencieZipPathList(assetNameList);
-
-        this.preloadZip = new PreloadZipList(zipPathList, assetPathList);
-        this.preloadAsset = new PreloadAssetList(prefabAssetPathList);
-
-        this.preloadZip.Start(
-            Handler.create(this, ()=>{
-                if(isLoadPrefab)
-                {
-                    this.preloadAsset.LoadList(
-                        
-                        Handler.create(this, ()=>{
-                            if(progressHandler) progressHandler.recover();
-                            if(completeHandler) completeHandler.run();
-                        }),
-
-                        // 加载prefab进度
-                        Handler.create(this, (progress)=>{
-                            if(progressHandler) progressHandler.runWith(progress * 0.3 + 0.7);
-                        }, null, false)
-                    );
-                }
-                else
-                {
-                    if(progressHandler) progressHandler.recover();
-                    if(completeHandler) completeHandler.run();
-                }
-            }),
-            // 加载Zip进度
-            Handler.create(this, (progress)=>{
-                if(isLoadPrefab)
-                {
-                    if(progressHandler) progressHandler.runWith(progress * 0.7);
-                }
-                else
-                {
-                    if(progressHandler) progressHandler.runWith(progress);
-                }
-            }, null, false),
-        );
-
-        // await this.preloadZip.StartAsync();
-        // if(this.preloadAsset)
-        // {
-        //     await this.preloadAsset.StartAsync();
-        // }
-       
-    }
 
     
     /** 隐藏默默加载 */
@@ -271,6 +167,16 @@ export default class PrefabManager
         let assetNameList:string[] = ZipManager.Instance.AssetPathListToAssetNameList(prefabAssetPathList);
         let zipPathList = manifest.GetAssetListDependencieZipPathList(assetNameList);
 
+        var tmpList = [];
+        for(var zipPath of zipPathList)
+        {
+            if(!ZipManager.Instance.HasZip(zipPath))
+            {
+                tmpList.push(zipPath);
+            }
+        }
+        zipPathList = tmpList;
+        
         this.preloadZip = new PreloadZipList(zipPathList, assetPathList);
         this.preloadAsset = new PreloadAssetList(prefabAssetPathList);
 

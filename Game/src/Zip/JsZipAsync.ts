@@ -20,8 +20,11 @@ export default class JsZipAsync
         
         if(!isUseLaya)
         {
-            FileTask.Request(path, (res:any, url)=>{
-                if(ZipManager.Instance.zipMap.has(path))
+            FileTask.Request(path, (res:any, url)=>
+            {
+                    Laya.loader.clearRes(path);
+
+                    if(ZipManager.Instance.zipMap.has(path))
                     {
                         let zip = ZipManager.Instance.zipMap.get(path);
                         callback.runWith(zip);
@@ -42,6 +45,8 @@ export default class JsZipAsync
             Laya.loader.load(path, 
                 Laya.Handler.create(null, (res: any) =>
                 {
+                    Laya.loader.clearRes(path);
+
                     if(ZipManager.Instance.zipMap.has(path))
                     {
                         let zip = ZipManager.Instance.zipMap.get(path);
@@ -56,6 +61,7 @@ export default class JsZipAsync
                         console.error(error, path);
                         callback.runWith(null);
                     })
+
                 }), 
                 null, type);
 

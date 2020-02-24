@@ -361,6 +361,9 @@
             if (url.indexOf("Conventional/res3d/Conventional") != -1) {
                 console.error("_addHierarchyInnerUrls path=", url);
             }
+            if (url.indexOf("Langyabing/res3d/Conventional") != -1) {
+                console.error("Langyabing/res3d/Conventional path=", url);
+            }
             ZipManager.Instance.GetOrLoadAssetData(url, Handler.create(this, (data) => {
                 if (data) {
                     Laya.timer.frameOnce(1, this, () => {
@@ -1046,6 +1049,7 @@
             }
             if (!isUseLaya) {
                 FileTask.Request(path, (res, url) => {
+                    Laya.loader.clearRes(path);
                     if (ZipManager.Instance.zipMap.has(path)) {
                         let zip = ZipManager.Instance.zipMap.get(path);
                         callback.runWith(zip);
@@ -1061,6 +1065,7 @@
             }
             else {
                 Laya.loader.load(path, Laya.Handler.create(null, (res) => {
+                    Laya.loader.clearRes(path);
                     if (ZipManager.Instance.zipMap.has(path)) {
                         let zip = ZipManager.Instance.zipMap.get(path);
                         callback.runWith(zip);
@@ -1402,7 +1407,11 @@
         }
         RemoveAssetReference(assetPath, count = 1) {
             if (this.assetReferenceMap.has(assetPath)) {
-                this.assetReferenceMap.set(assetPath, this.assetReferenceMap.get(assetPath) - count);
+                var v = this.assetReferenceMap.get(assetPath) - count;
+                if (v < 0) {
+                    v = 0;
+                }
+                this.assetReferenceMap.set(assetPath, v);
             }
         }
         GetAssetReference(assetPath) {
@@ -1416,8 +1425,10 @@
             this.RemoveAssetReference(assetPath);
         }
         DestroyUnusedAssets() {
+            var clearKeyList = [];
             this.assetReferenceMap.forEach((referenceCount, assetPath) => {
                 if (referenceCount <= 0 && this.assetMap.has(assetPath)) {
+                    clearKeyList.push(assetPath);
                     var assetData = this.assetMap.get(assetPath);
                     this.assetMap.delete(assetPath);
                     let assetName = this.manifest.GetAssetNameByPath(assetPath);
@@ -1426,16 +1437,24 @@
                 }
             });
             this.DestroyUnusedZip();
+            for (var assetPath of clearKeyList) {
+                this.assetReferenceMap.delete(assetPath);
+            }
         }
         DestroyUnusedZip() {
+            var clearKeyList = [];
             this.zipUseAssetMap.forEach((infoMap, zipPath) => {
                 if (infoMap.size == 0) {
+                    clearKeyList.push(zipPath);
                     if (this.zipMap.has(zipPath)) {
                         var zip = this.zipMap.get(zipPath);
                         this.zipMap.delete(zipPath);
                     }
                 }
             });
+            for (var zipPath of clearKeyList) {
+                this.zipUseAssetMap.delete(zipPath);
+            }
         }
         PrintAssetReferenceMap() {
             this.assetReferenceMap.forEach((count, assetName) => {
@@ -1526,7 +1545,7 @@
             }
             return data;
         }
-        GetOrLoadAssetData(url, callback) {
+        GetOrLoadAssetData(url, callback, isAddAssetReference = true) {
             var assetPath = this.AssetUrlToPath(url);
             if (!this.manifest.HasAssetByPath(assetPath)) {
                 callback.runWith(null);
@@ -1539,7 +1558,9 @@
             }
             if (this.assetMap.has(assetPath)) {
                 data = this.assetMap.get(assetPath);
-                this.AddAssetReference(assetPath);
+                if (isAddAssetReference) {
+                    this.AddAssetReference(assetPath);
+                }
                 callback.runWith(data);
             }
             else {
@@ -1550,7 +1571,9 @@
                         if (assetReferenceCount > 0) {
                             console.error("ZipManager.GetAssetDataAsync 已经存在创建的资源了", assetPath, assetReferenceCount);
                         }
-                        this.AddAssetReference(assetPath);
+                        if (isAddAssetReference) {
+                            this.AddAssetReference(assetPath);
+                        }
                         this.assetMap.set(assetPath, data);
                         WaitCallbackList.RunWith(url, data);
                     }));
@@ -2200,7 +2223,7 @@
                         if (completeHandler)
                             completeHandler.run();
                     }
-                }));
+                }), false);
             }
         }
         async LoadListAsync() {
@@ -2392,75 +2415,6 @@
             this.preloadZip = null;
             this.preloadAsset = null;
         }
-        LoadPrefabList2(resIdList, isLoadPrefab = true, completeHandler, progressHandler) {
-            this.StopPreload();
-            let len = resIdList.length;
-            if (len == 0) {
-                if (completeHandler)
-                    completeHandler.run();
-                return;
-            }
-            var manifest = ZipManager.Instance.manifest;
-            let prefabAssetPathList = [];
-            let assetPathList = [];
-            var tmpMap = new Map();
-            for (let resId of resIdList) {
-                let assetPath = this.ResFileNameToAssetPath(resId);
-                let item = Laya.Loader.getRes(assetPath);
-                if (item) {
-                    continue;
-                }
-                if (!manifest.HasAssetByPath(assetPath)) {
-                    console.warn("Zip 文件清单中不存在资源", assetPath);
-                    continue;
-                }
-                let dependencieAssetPathList = manifest.GetAssetDependenciePathListByAssetPath(assetPath);
-                for (let dependencieAssetPath of dependencieAssetPathList) {
-                    if (tmpMap.has(dependencieAssetPath)) {
-                        continue;
-                    }
-                    let item = Laya.Loader.getRes(dependencieAssetPath);
-                    if (item) {
-                        continue;
-                    }
-                    assetPathList.push(dependencieAssetPath);
-                    tmpMap.set(dependencieAssetPath, true);
-                }
-                prefabAssetPathList.push(assetPath);
-            }
-            let assetNameList = ZipManager.Instance.AssetPathListToAssetNameList(prefabAssetPathList);
-            let zipPathList = manifest.GetAssetListDependencieZipPathList(assetNameList);
-            this.preloadZip = new PreloadZipList(zipPathList, assetPathList);
-            this.preloadAsset = new PreloadAssetList(prefabAssetPathList);
-            this.preloadZip.Start(Handler$5.create(this, () => {
-                if (isLoadPrefab) {
-                    this.preloadAsset.LoadList(Handler$5.create(this, () => {
-                        if (progressHandler)
-                            progressHandler.recover();
-                        if (completeHandler)
-                            completeHandler.run();
-                    }), Handler$5.create(this, (progress) => {
-                        if (progressHandler)
-                            progressHandler.runWith(progress * 0.3 + 0.7);
-                    }, null, false));
-                }
-                else {
-                    if (progressHandler)
-                        progressHandler.recover();
-                    if (completeHandler)
-                        completeHandler.run();
-                }
-            }), Handler$5.create(this, (progress) => {
-                if (isLoadPrefab) {
-                    if (progressHandler)
-                        progressHandler.runWith(progress * 0.7);
-                }
-                else {
-                    if (progressHandler)
-                        progressHandler.runWith(progress);
-                }
-            }, null, false));
-        }
         LoadPrefabList(pathList, prefabAssetPathList, isLoadPrefab = true, completeHandler, progressHandler) {
             this.StopPreload();
             let len = pathList.length;
@@ -2503,6 +2457,13 @@
             }
             let assetNameList = ZipManager.Instance.AssetPathListToAssetNameList(prefabAssetPathList);
             let zipPathList = manifest.GetAssetListDependencieZipPathList(assetNameList);
+            var tmpList = [];
+            for (var zipPath of zipPathList) {
+                if (!ZipManager.Instance.HasZip(zipPath)) {
+                    tmpList.push(zipPath);
+                }
+            }
+            zipPathList = tmpList;
             this.preloadZip = new PreloadZipList(zipPathList, assetPathList);
             this.preloadAsset = new PreloadAssetList(prefabAssetPathList);
             this.preloadZip.Start(Handler$5.create(this, () => {

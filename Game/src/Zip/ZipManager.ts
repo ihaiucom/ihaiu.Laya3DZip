@@ -167,7 +167,12 @@ export default class ZipManager
     {
         if(this.assetReferenceMap.has(assetPath))
         {
-            this.assetReferenceMap.set(assetPath, this.assetReferenceMap.get(assetPath) - count);
+            var v = this.assetReferenceMap.get(assetPath) - count;
+            if(v < 0)
+            {
+                v = 0;
+            }
+            this.assetReferenceMap.set(assetPath, v);
         }
     }
 
@@ -193,10 +198,12 @@ export default class ZipManager
     /** 卸载没有使用的资源 */
     DestroyUnusedAssets(): void 
     {
+        var clearKeyList = [];
         this.assetReferenceMap.forEach((referenceCount, assetPath)=>
         {
             if(referenceCount <= 0 && this.assetMap.has(assetPath))
             {
+                clearKeyList.push(assetPath);
                 var assetData = this.assetMap.get(assetPath);
                 this.assetMap.delete(assetPath);
                 let assetName = this.manifest.GetAssetNameByPath(assetPath);
@@ -206,16 +213,23 @@ export default class ZipManager
             }
         });
         this.DestroyUnusedZip();
+
+        for(var assetPath of clearKeyList)
+        {
+            this.assetReferenceMap.delete(assetPath);
+        }
     }
     
     
     /** 卸载没有使用的Zip */
     DestroyUnusedZip(): void 
     {
+        var clearKeyList = [];
         this.zipUseAssetMap.forEach((infoMap, zipPath)=>
         {
             if(infoMap.size == 0)
             {
+                clearKeyList.push(zipPath);
                 // console.log("ZipManager.DestroyUnusedZip 清理Zip", zipPath);
                 if(this.zipMap.has(zipPath))
                 {
@@ -225,6 +239,12 @@ export default class ZipManager
                 
             }
         });
+
+        
+        for(var zipPath of clearKeyList)
+        {
+            this.zipUseAssetMap.delete(zipPath);
+        }
 	}
 
 
@@ -379,7 +399,7 @@ export default class ZipManager
 
 
     /** 获取资源内容 */
-    public GetOrLoadAssetData(url:string, callback: Handler)
+    public GetOrLoadAssetData(url:string, callback: Handler, isAddAssetReference: boolean = true)
     {
         var assetPath:string = this.AssetUrlToPath(url);
         if(!this.manifest.HasAssetByPath(assetPath))
@@ -400,7 +420,10 @@ export default class ZipManager
         if(this.assetMap.has(assetPath))
         {
             data = this.assetMap.get(assetPath);
-            this.AddAssetReference(assetPath);
+            if(isAddAssetReference)
+            {
+                this.AddAssetReference(assetPath);
+            }
             callback.runWith(data);
         }
         else
@@ -415,7 +438,11 @@ export default class ZipManager
                     {
                         console.error("ZipManager.GetAssetDataAsync 已经存在创建的资源了", assetPath, assetReferenceCount);
                     }
-                    this.AddAssetReference(assetPath);
+
+                    if(isAddAssetReference)
+                    {
+                        this.AddAssetReference(assetPath);
+                    }
                     this.assetMap.set(assetPath, data);
                     WaitCallbackList.RunWith(url, data);
                 }));

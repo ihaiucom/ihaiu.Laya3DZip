@@ -219,7 +219,7 @@ export default class PreloadZipList
                     if(progressHandler) progressHandler.recover();
                     if(completeHandler) completeHandler.run();
                 }
-            }));
+            }), false);
         }
     }
 

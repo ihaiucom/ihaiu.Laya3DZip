@@ -10,13 +10,13 @@ export default class JsZipAsync
     static loadPath(path: string, type:string, callback:Handler)
     {
         var isUseLaya = false;
-        if(path.indexOf("res3d/") != -1)
-        {
-            if(path.indexOf("Effect_100") != -1|| path.indexOf("Hero_100") != -1)
-            {
-                isUseLaya = true;
-            }
-        }
+        // if(path.indexOf("res3d/") != -1)
+        // {
+        //     if(path.indexOf("Effect_100") != -1|| path.indexOf("Hero_100") != -1)
+        //     {
+        //         isUseLaya = true;
+        //     }
+        // }
         
         if(!isUseLaya)
         {

@@ -64,8 +64,15 @@ export default class AssetManifest
 
         for(let assetId in this.assetId2Name)
         {
+            var assetIdInt = parseInt(assetId) ;
             let assetName = this.assetId2Name[assetId];
-            this.assetName2Id[assetName] = parseInt(assetId) ;
+            this.assetName2Id[assetName] = assetIdInt ;
+
+            if(!this.assetsDependencie[assetId])
+            {
+                this.assetsDependencie[assetId] = [assetIdInt];
+            }
+
         }
 
         for(let zipId in this.zipAssets)

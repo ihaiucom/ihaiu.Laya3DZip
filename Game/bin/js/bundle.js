@@ -48,8 +48,12 @@
                 this.assetsDependencie = this.prefabDependencie;
             }
             for (let assetId in this.assetId2Name) {
+                var assetIdInt = parseInt(assetId);
                 let assetName = this.assetId2Name[assetId];
-                this.assetName2Id[assetName] = parseInt(assetId);
+                this.assetName2Id[assetName] = assetIdInt;
+                if (!this.assetsDependencie[assetId]) {
+                    this.assetsDependencie[assetId] = [assetIdInt];
+                }
             }
             for (let zipId in this.zipAssets) {
                 let zipIdInt = parseInt(zipId);
@@ -1041,13 +1045,7 @@
 
     class JsZipAsync {
         static loadPath(path, type, callback) {
-            var isUseLaya = false;
-            if (path.indexOf("res3d/") != -1) {
-                if (path.indexOf("Effect_100") != -1 || path.indexOf("Hero_100") != -1) {
-                    isUseLaya = true;
-                }
-            }
-            if (!isUseLaya) {
+            {
                 FileTask.Request(path, (res, url) => {
                     Laya.loader.clearRes(path);
                     if (ZipManager.Instance.zipMap.has(path)) {
@@ -1062,22 +1060,6 @@
                         callback.runWith(null);
                     });
                 });
-            }
-            else {
-                Laya.loader.load(path, Laya.Handler.create(null, (res) => {
-                    Laya.loader.clearRes(path);
-                    if (ZipManager.Instance.zipMap.has(path)) {
-                        let zip = ZipManager.Instance.zipMap.get(path);
-                        callback.runWith(zip);
-                        return;
-                    }
-                    JSZip.loadAsync(res).then((zip) => {
-                        callback.runWith(zip);
-                    }).catch((error) => {
-                        console.error(error, path);
-                        callback.runWith(null);
-                    });
-                }), null, type);
             }
         }
         static read(zip, path, type, callback) {
@@ -2455,7 +2437,7 @@
                     tmpMap.set(dependencieAssetPath, true);
                 }
             }
-            let assetNameList = ZipManager.Instance.AssetPathListToAssetNameList(prefabAssetPathList);
+            let assetNameList = ZipManager.Instance.AssetPathListToAssetNameList(assetPathList);
             let zipPathList = manifest.GetAssetListDependencieZipPathList(assetNameList);
             var tmpList = [];
             for (var zipPath of zipPathList) {

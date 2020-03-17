@@ -164,7 +164,7 @@ export default class PrefabManager
             }
         }
         
-        let assetNameList:string[] = ZipManager.Instance.AssetPathListToAssetNameList(prefabAssetPathList);
+        let assetNameList:string[] = ZipManager.Instance.AssetPathListToAssetNameList(assetPathList);
         let zipPathList = manifest.GetAssetListDependencieZipPathList(assetNameList);
 
         var tmpList = [];

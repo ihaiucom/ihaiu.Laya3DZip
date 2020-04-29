@@ -608,7 +608,6 @@
             }
         }
         Request(url, callback, callbackObj) {
-            console.log("HRHead.Request", url);
             this.url = url;
             this.callback = callback;
             this.callbackObj = callbackObj;
@@ -813,11 +812,11 @@
         }
         SpliteBlock() {
             var size = this.totalSize;
-            var ProcessorCount = FileTask.MaxBlockNum;
             var singleTmpFileSize = FileTask.singleTmpFileSize;
             var blockList = this.blockList;
-            var blockSize = Math.floor(size / ProcessorCount);
-            var modSize = this.totalSize % ProcessorCount;
+            var blockSize = singleTmpFileSize;
+            var blockCount = Math.floor(size / blockSize);
+            var modSize = size % blockSize;
             var block;
             if (size < singleTmpFileSize || size <= 0) {
                 block = FileBlock.PoolGetItem();
@@ -833,13 +832,13 @@
                 blockList.push(block);
             }
             else {
-                for (var i = 0; i < ProcessorCount; i++) {
+                for (var i = 0; i < blockCount; i++) {
                     block = FileBlock.PoolGetItem();
                     block.fileTask = this;
                     block.index = i;
                     block.begin = i * blockSize;
                     block.end = (i + 1) * blockSize - 1;
-                    if (i == ProcessorCount - 1) {
+                    if (i == blockCount - 1) {
                         block.end += modSize;
                     }
                     blockList.push(block);
@@ -1031,15 +1030,13 @@
             }
         }
     }
-    FileTask.MaxBlockNum = 2;
     FileTask.singleTmpFileSize = 1024 * 1024 * 5;
     FileTask.pool = [];
     window['FileTask'] = FileTask;
     window['FileBlock'] = FileBlock;
     window['HRHead'] = HRHead;
     window['HRange'] = HRange;
-    FileTask.MaxBlockNum = 5;
-    FileTask.singleTmpFileSize = 1024 * 1024 * 5;
+    FileTask.singleTmpFileSize = Math.floor(1024 * 1024 * 0.5);
     HRHead.MaxNum = 5;
     HRange.MaxNum = 5;
 

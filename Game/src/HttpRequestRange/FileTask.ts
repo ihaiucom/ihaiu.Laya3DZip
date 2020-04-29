@@ -5,8 +5,6 @@ import HRange from "./HRRange";
 /** 文件任务 */
 export default class FileTask
 {
-    /** 最大处理数量 */
-    static MaxBlockNum = 2;
     /** 单个块最小大小 */
     static singleTmpFileSize = 1024 * 1024 * 5;
     // static singleTmpFileSize = 1024;
@@ -82,15 +80,22 @@ export default class FileTask
     SpliteBlock()
     {
         var size = this.totalSize;
-        var ProcessorCount = FileTask.MaxBlockNum;
         var singleTmpFileSize = FileTask.singleTmpFileSize;
         var blockList = this.blockList;
 
 
-        //文件块大小
-        var blockSize   = Math.floor(size / ProcessorCount);  
-        //余数
-        var modSize     = this.totalSize % ProcessorCount;
+        // //文件块大小
+        // var blockSize   = Math.floor(size / ProcessorCount);  
+        // //余数
+        // var modSize     = this.totalSize % ProcessorCount;
+
+        
+        // 文件块大小
+        var blockSize   = singleTmpFileSize; 
+        // 文件块数量
+        var blockCount  = Math.floor(size / blockSize); 
+        // 余数
+        var modSize     = size % blockSize;
 
         
         var block:FileBlock;
@@ -112,7 +117,7 @@ export default class FileTask
         }
         else
         {
-            for(var i = 0; i < ProcessorCount; i ++)
+            for(var i = 0; i < blockCount; i ++)
             {
                 block = FileBlock.PoolGetItem();
                 block.fileTask = this;
@@ -120,7 +125,7 @@ export default class FileTask
                 block.begin = i * blockSize;
                 block.end = (i + 1) * blockSize - 1;
 
-                if (i == ProcessorCount - 1)
+                if (i == blockCount - 1)
                 {
                     block.end += modSize;
                 }
@@ -417,7 +422,6 @@ window['HRHead'] = HRHead;
 window['HRange'] = HRange;
 
 
-FileTask.MaxBlockNum = 5;
-FileTask.singleTmpFileSize =  1024 * 1024 * 5;
+FileTask.singleTmpFileSize = Math.floor(1024 * 1024 * 0.5) ;
 HRHead.MaxNum = 5;
 HRange.MaxNum = 5;
